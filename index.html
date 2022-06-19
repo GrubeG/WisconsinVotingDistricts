@@ -151,7 +151,7 @@
         var layerCongressional = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_CongressionalDistricts/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.3,
+          opacity: 0.5,
           title: "Congressional Districts",
           visible: false,
           popupTemplate: {
@@ -181,7 +181,7 @@
         var layerAssembly = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Assembly_Districts/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.8,
+          opacity: 0.5,
           title: "State Assembly",
           visible: false,
           popupTemplate: {
@@ -196,7 +196,7 @@
         var layerDistrictCombos = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Redistricting_DCs/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.8,
+          opacity: 0.3,
           title: "District Combos",
           visible: true,
           popupTemplate: {
@@ -1037,11 +1037,11 @@
     <div id="infoToolbar" class="esri-widget">
         <div class="image"></div>
         <h3>Wisconsin Voting Districts</h3>
-        The Giant Sequoia is the most massive type of tree in the world. While it is well adapted to natural fire conditions, because of changing climate conditions and fire supression methods, the Sequoia are at much greater risk of destructive fires today, including those in the summer of 2021. As a result, the park has decided to task both its own staff and volunteers to inventory the Giant Sequoias within the known groves in the park.
+        When ballots are created for election, the races are determined by different districts.
         <br><br>
-        To use this application, click on the tools to the right of the map. The primary tool is an editor tool to add a new tree entry or edit existing information. There is also a filter for Points of Interest and a query tool to find Points of Interest near the user's location. Finally, there are tools for searching for locations, turning on/off data layers and for viewing a legend.
+        Every 10 years, as a result of the U.S. Census, Wisconsin has to complete the redistricting process
         <br>
-        <h6>Data and symbology courtesy National Park Service. Created by Greg Grube for Geography 777 at UW-Madison, Spring 2022.</h6>
+        <h6>Created by Greg Grube for Geography 777 at UW-Madison, Summer 2022.</h6>
 
     </div>
     <div id="poi-filter" class="esri-widget">
