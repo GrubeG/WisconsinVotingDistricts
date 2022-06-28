@@ -118,6 +118,7 @@
         "esri/widgets/Legend",
         "esri/widgets/FeatureTemplates",
         "esri/config",
+        "esri/widgets/Print",
         
           
         "dojo/on",
@@ -145,6 +146,7 @@
         Legend,
         FeatureTemplates,
         esriConfig,
+        Print,
         on, dom, domConstruct
       ) => {
           
@@ -209,12 +211,40 @@
             overwriteActions: false
           }
         });
+          
+        // add the park trails featurelayer
+        var layerWards = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Wards/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "Wards",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Wards",
+            content: "County: {CNTY_NAME} </br> Ward: {LABEL}",
+            overwriteActions: false
+          },
+          minScale: 400000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 2,
+                  color: "blue"
+                }
+              }
+            }
+        });
         
         // add the park trails featurelayer
         var layerDistrictCombos = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Redistricting_DCs/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.3,
+          opacity: 0.6,
           title: "District Combos",
           visible: false,
           popupTemplate: {
@@ -222,7 +252,20 @@
             title: "District Combo",
             content: "County: {CNTY_NAME} </br> Ward: {LABEL} </br> School: {SDNM} </br> {SanName}",
             overwriteActions: false
-          }
+          },
+          minScale: 400000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 2,
+                  color: "red"
+                }
+              }
+            }
         });
           
         // add the park trails featurelayer
@@ -278,120 +321,11 @@
 //            overwriteActions: false
 //          }
         });
-          
-        
-        
-          
-//        // View how each marker
-//        // symbol is created for Points of Interest
-//        const layerPOIRenderer = {
-//          type: "unique-value",
-//          field: "POITYPE",
-//          uniqueValueInfos: [
-//            {
-//              value: "Restroom",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/restrooms-black-22.svg",
-//                contentType: "image/svg",  
-//              }   
-//            },
-//            {
-//              value: "Trailhead",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/trailhead-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Ranger Station",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/ranger-station-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Campground",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/campground-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Telephone",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/telephone-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Picnic Area",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/picnic-area-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Store",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/snack-bar-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Lodge",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/sleeping-shelter-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Entrance Station",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/entrance-station-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Visitor Center",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/visitor-center-black-22.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//          ]
-//        };
-        
-        // add the park points of interest featurelayer
-        var layerPOI = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_poi/FeatureServer/0",
-          outFields: ["POITYPE"],
-          title: "Points of Interest",
-          visible: true,
-          //renderer: layerPOIRenderer,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "Feature: {POINAME}",
-            content: "Feature Type: {POITYPE}",
-            overwriteActions: false
-          }
-        });
-        
-        
-          
+              
         // Create the Map
         const map = new Map({
           basemap: "topo-vector",
-          layers: [layerCongressional, layerCountySup, layerSenate, layerDistrictCombos, layerAssembly, layerMunis, layerCounties, layerPOI]
+          layers: [layerCongressional, layerSenate, layerAssembly, layerCountySup,  layerWards, layerDistrictCombos,  layerMunis, layerCounties, layerCounties]
         });
           
         let editor, features, editExpand, filterLayerView, queryLayerView;
@@ -424,111 +358,10 @@
             
         }
 
-              
-//        /*************************************************************
-//         * The PopupTemplate content is the text that appears inside the
-//         * popup. Bracketed {fieldName} can be used to reference the value
-//         * of an attribute of the selected feature. HTML elements can be
-//         * used to provide structure and styles within the content.
-//         **************************************************************/
-//        const editThisAction = {
-//          title: "Edit feature",
-//          id: "edit-this",
-//          className: "esri-icon-edit"
-//        };
-//
-//        // Create a popupTemplate for the featurelayer and pass in a function to set its content and specify an action to handle editing the selected feature
-//        const template = {
-//          title: "User Name: {UserName}",
-//          content: OverallConLevel,
-//          fieldInfos: [
-//            {
-//              fieldName: "UserName"
-//            },
-//            {
-//              fieldName: "OverallCon"
-//            }
-//          ],
-//          //actions: [editThisAction]
-//        };
-//
-//        // Function that creates two popup elements for the template: attachments and text
-//        function OverallConLevel(feature) {
-//          // 1. Set how the attachments should display within the popup
-//          const attachmentsElement = new AttachmentsContent({
-//            displayType: "list"
-//          });
-//
-//          const textElement = new TextContent();
-//
-//          
-//        }
-//        // View how each marker
-//        // symbol is created for Points of Interest
-//        const layerTreesRenderer = {
-//          type: "unique-value",
-//          field: "OverallCon",
-//          uniqueValueInfos: [
-//            {
-//              value: "Excellent",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/sequoia-excellent.svg",
-//                contentType: "image/svg",  
-//              }   
-//            },
-//            {
-//              value: "Good",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/sequoia-good.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Average",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/sequoia-average.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Poor",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/sequoia-poor.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            {
-//              value: "Fallen",
-//              symbol: {
-//                type: "picture-marker",
-//                url: "img/sequoia-fallen.svg",
-//                contentType: "image/svg",
-//              }
-//            },
-//            
-//          ]
-//        };
-//
-//        var layerTrees = new FeatureLayer({
-//          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_trees/FeatureServer/0",
-//          outFields: ["*"],
-//          title: "Sequoia Trees",
-//          visible: true,
-//          renderer: layerTreesRenderer,
-//          popupTemplate: {
-//            // autocasts as new PopupTemplate()
-//            title: "Tree Condition - {OverallCon}",
-//            content: "</br>Grove: {GroveName} </br>Tree Diameter: {TreeDiam} </br>Surface Fuel Level: {SurFuel} </br>Burn Damage: {BurnDamage} </br>Collector Name: {UserName} </br>Collector Role: {UserType}",
-//            overwriteActions: false
-//          }
-//          //popupTemplate: template
-//        });
-//        map.add(layerTrees);
-
+        // *****************************************************
+        // Set up the Default MapView
+        // *****************************************************
+          
         // Create the MapView
         const view = new MapView({
           container: "viewDiv",
@@ -557,7 +390,7 @@
             
           let layerListExpand = new Expand({
               expandIconClass: "esri-icon-layers",
-              expandTooltip: "Expand Layer List",
+              expandTooltip: "Expand Districts List",
               view: view,
               expanded: false,
               content: layerList,
@@ -602,6 +435,36 @@
           
         //add text information
           view.ui.add(tooltipExpand, {
+            position: "top-left",
+            //index: 1
+            });
+          
+        // *****************************************************
+        // Create print widget with the associated actions
+        // and add it to the top-right corner of the view.
+        // ***************************************************** 
+        
+        //add print information
+        let printMap = new Print({
+            view: view,  // The view that provides access to the map's "streets-vector" basemap
+            // specify your own print service
+            printServiceUrl:
+                "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        });
+          
+        
+        let printExpand = new Expand({
+              expandIconClass: "esri-icon-printer",
+              expandTooltip: "Expand Print/Export",
+              view: view,
+              expanded: false,
+              content: printMap ,
+              mode: "floating",
+              group: "top-left"
+            });
+          
+        //add text information
+          view.ui.add(printExpand, {
             position: "top-left",
             //index: 1
             });
@@ -719,14 +582,14 @@
             },
             
             {
-              layer: layerDistrictCombos,
+              layer: layerWards,
               searchFields: ["LABEL"],
               displayField: "LABEL",
               //suggestionTemplate: "{Name}, Party: {Party}",
               exactMatch: false,
-              outFields: ["LABEL", "SDNM"],
+              outFields: ["LABEL"],
               placeholder: "Example: ADAMS",
-              name: "District Combos",
+              name: "Wards",
 
             },
           ]
@@ -821,7 +684,7 @@
 //
 //        function queryFeatures(screenPoint) {
 //          const point = view.toMap(screenPoint);
-//          layerPOI.queryFeatures({
+//          layerCounties.queryFeatures({
 //              geometry: point,
 //              // distance and units will be null if basic query selected
 //              distance: distance,
@@ -913,7 +776,7 @@
           };
         }
 
-        view.whenLayerView(layerPOI).then((layerView) => {
+        view.whenLayerView(layerCounties).then((layerView) => {
           // flash filter warnings layer loaded
           // get a reference to the filter warnings layerview
           filterLayerView = layerView;
@@ -968,7 +831,7 @@
         
         
         <br>
-        <h6>Created by Greg Grube for Geography 777 at UW-Madison, Summer 2022.</h6>
+        <h6>Created by Greg Grube for Geography 778 at UW-Madison, Summer 2022.</h6>
 
     </div>
     <div id="poi-filter" class="esri-widget">
