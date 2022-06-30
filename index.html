@@ -233,9 +233,28 @@
                 type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
                 color: null,
                 outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 2,
+                  width: 1.5,
                   color: "blue"
                 }
+              }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "blue",
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.WardLbl"
               }
             }
         });
@@ -261,9 +280,28 @@
                 type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
                 color: null,
                 outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 2,
+                  width: 1.25,
                   color: "red"
                 }
+              }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "red",
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 200000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.WARDID + TextFormatting.NewLine + $feature.SDNM + TextFormatting.NewLine + $feature.SanName"
               }
             }
         });
@@ -283,10 +321,30 @@
                 type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
                 color: null,
                 outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 1.5,
+                  width: 2,
                   color: "gray"
                 }
               }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "gray",
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.MuniName"
+              },
+              //deconflictionStrategy: "none"
             }
 //          popupTemplate: {
 //            // autocasts as new PopupTemplate()
@@ -309,7 +367,7 @@
                 type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
                 color: null,
                 outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 1.5,
+                  width: 2.25,
                   color: "black"
                 }
               }
@@ -797,7 +855,7 @@
           poisExpand.watch("expanded", () => {
             if (poisExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Filter Point of Interest type by selecting from the list. Closing the Filter tool will reset to default.";
+              fieldNameText.textContent = "Filter view of data layers. Closing the Filter tool will reset to default.";
             }
             //clear the filters when user closes the expand widget  
             if (!poisExpand.expanded) {
@@ -835,16 +893,8 @@
 
     </div>
     <div id="poi-filter" class="esri-widget">
-      <div class="poi-item visible-poi" data-poi="Restroom">Restroom</div>
-      <div class="poi-item visible-poi" data-poi="Ranger Station">Ranger Station</div>
-      <div class="poi-item visible-poi" data-poi="Trailhead">Trailhead</div>
-      <div class="poi-item visible-poi" data-poi="Campground">Campground</div>
-      <div class="poi-item visible-poi" data-poi="Telephone">Telephone</div>
-      <div class="poi-item visible-poi" data-poi="Picnic Area">Picnic Area</div>
-      <div class="poi-item visible-poi" data-poi="Store">Store</div>
-      <div class="poi-item visible-poi" data-poi="Lodge">Lodge</div>
-      <div class="poi-item visible-poi" data-poi="Entrance Station">Entrance Station</div>
-      <div class="poi-item visible-poi" data-poi="Visitor Center">Visitor Center</div>
+      <div class="poi-item visible-poi" data-poi="Current County">Current County</div>
+      <div class="poi-item visible-poi" data-poi="Current Municipality">Current Muni</div>
     </div>
 <!--
     <div id="optionsDiv" class="esri-widget">
