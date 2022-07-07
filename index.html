@@ -73,7 +73,7 @@
       }
         
       div.image::before {
-        content:url("img/SEKI_logo.PNG");
+        content:url("img/WEC_Logo.webp");
       }
       
         
@@ -119,6 +119,7 @@
         "esri/widgets/FeatureTemplates",
         "esri/config",
         "esri/widgets/Print",
+        "esri/widgets/Slider",
         
           
         "dojo/on",
@@ -147,6 +148,7 @@
         FeatureTemplates,
         esriConfig,
         Print,
+        Slider,
         on, dom, domConstruct
       ) => {
           
@@ -372,7 +374,8 @@
                 expression: "$feature.MuniName"
               },
               //deconflictionStrategy: "none"
-            }
+            },
+            labelsVisible: true,
 //          popupTemplate: {
 //            // autocasts as new PopupTemplate()
 //            title: "Municipality",
@@ -398,7 +401,31 @@
                   color: "black"
                 }
               }
-            }
+            },
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.CNTY_NAME"
+              },
+              //deconflictionStrategy: "none"
+            },
+            labelsVisible: false,
 //          popupTemplate: {
 //            // autocasts as new PopupTemplate()
 //            title: "County",
@@ -467,18 +494,124 @@
         // and add it to the top-right corner of the view.
         // *****************************************************
         
+          //Define additional functions section of the layerlist
+          function defineActions(event) {
+              // The event object contains an item property.
+              // is is a ListItem referencing the associated layer
+              // and other properties. You can control the visibility of the
+              // item, its title, and actions using this object.
+
+              const item = event.item;
+
+              //if (item.title === "Counties") {
+                // An array of objects defining actions to place in the LayerList.
+                // By making this array two-dimensional, you can separate similar
+                // actions into separate groups with a breaking line.
+
+                item.actionsSections = [
+                  [
+                    {
+                      title: "Toggle Labels",
+                      className: "esri-icon-labels",
+                      id: "labels"
+                    },
+//                    {
+//                      title: "Layer information",
+//                      className: "esri-icon-description",
+//                      id: "information"
+//                    }
+                  ],
+//                  [
+//                    {
+//                      title: "Increase opacity",
+//                      className: "esri-icon-up",
+//                      id: "increase-opacity"
+//                    },
+//                    {
+//                      title: "Decrease opacity",
+//                      className: "esri-icon-down",
+//                      id: "decrease-opacity"
+//                    }
+//                  ]
+                ];
+              //}
+          
+          
+              // Adds a slider for updating a group layer's opacity
+              //if (item.children.length > 1 && item.parent) {
+                const slider = new Slider({
+                  min: 0,
+                  max: 1,
+                  precision: 2,
+                  //steps: 0.2,
+                  values: [1],
+                  snapOnClickEnabled: true,
+                  visibleElements: {
+                    labels: true,
+                    rangeLabels: true
+                  }
+                });
+
+                item.panel = {
+                  content: [
+                      slider,
+                      
+                  ],
+                  className: "esri-icon-sliders-horizontal",
+                  title: "Change Layer Opacity"
+                };
+
+                slider.on("thumb-drag", (event) => {
+                  const { value } = event;
+                  item.layer.opacity = value;
+                });
+              //}
+          }
+          
           // LayerList
           layerList = new LayerList({
               container: document.createElement("div"),
-              view: view
+              view: view,
+              listItemCreatedFunction: defineActions
             });
+          
+          // Event listener that fires each time an action is triggered
+
+          layerList.on("trigger-action", (event) => {
+            // The layer visible in the view at the time of the trigger.
+            //const visibleLayer = layerCounties.visible;
+
+            // Capture the action id.
+            const id = event.action.id;
+
+            
+                
+            
+                if (id === "labels") {
+                  if (event.item.layer.labelsVisible  === false) {
+                    event.item.layer.labelsVisible = true;
+                    console.log(event.item.layer.labelsVisible);
+                  } else {
+                    event.item.layer.labelsVisible = false;
+                    console.log(event.item.layer.labelsVisible);
+                  }
+                }
+              
+              
+//             else if (id === "information") {
+//              // if the information action is triggered, then
+//              // open the item details page of the service layer
+//              window.open(visibleLayer.url);
+//            } 
+          });
+          
             
           let layerListExpand = new Expand({
               expandIconClass: "esri-icon-layers",
               expandTooltip: "Expand Districts List",
               view: view,
               expanded: false,
-              content: layerList,
+              content: layerList.container,
               mode: "floating",
               group: "top-right"
             });
