@@ -73,7 +73,7 @@
       }
         
       div.image::before {
-        content:url("img/WEC_Logo.webp");
+        content:url("img/WEC_Logo.png");
       }
       
         
@@ -334,6 +334,55 @@
         });
           
         // add the park trails featurelayer
+        var layerSchools = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SchoolDistricts/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "School Districts",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "School District",
+            content: "District Name: {SDNM} </br> {Union_HS} </br> School District Type: {TYPE}",
+            overwriteActions: false
+          },
+          minScale: 600000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 2,
+                  color: "green"
+                }
+              }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "green",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 400000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.SDNM + TextFormatting.NewLine + $feature.Union_HS"
+              }
+            }
+        });
+          
+        // add the park trails featurelayer
         var layerMunis = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Municipality_CombinedCounty/FeatureServer/0",
           //outFields: ["*"],
@@ -425,7 +474,7 @@
               },
               //deconflictionStrategy: "none"
             },
-            labelsVisible: false,
+            labelsVisible: true,
 //          popupTemplate: {
 //            // autocasts as new PopupTemplate()
 //            title: "County",
@@ -437,7 +486,7 @@
         // Create the Map
         const map = new Map({
           basemap: "topo-vector",
-          layers: [layerCongressional, layerSenate, layerAssembly, layerCountySup,  layerWards, layerDistrictCombos,  layerMunis, layerCounties, layerCounties]
+          layers: [layerCongressional, layerSenate, layerAssembly, layerCountySup, layerSchools, layerWards, layerDistrictCombos,  layerMunis, layerCounties]
         });
           
         let editor, features, editExpand, filterLayerView, queryLayerView;
@@ -586,16 +635,16 @@
 
             
                 
-            
-                if (id === "labels") {
-                  if (event.item.layer.labelsVisible  === false) {
-                    event.item.layer.labelsVisible = true;
-                    console.log(event.item.layer.labelsVisible);
-                  } else {
-                    event.item.layer.labelsVisible = false;
-                    console.log(event.item.layer.labelsVisible);
-                  }
-                }
+            //toggle labels for each layer on and off
+            if (id === "labels") {
+              if (event.item.layer.labelsVisible  === false) {
+                event.item.layer.labelsVisible = true;
+                console.log(event.item.layer.labelsVisible);
+              } else {
+                event.item.layer.labelsVisible = false;
+                console.log(event.item.layer.labelsVisible);
+              }
+            }
               
               
 //             else if (id === "information") {
@@ -793,21 +842,21 @@
               displayField: "Label",
               exactMatch: false,
               //outFields: ["POINAME", "POITYPE"],
-              name: "Municipalities",
+              name: "Municipality",
               //zoomScale: 10000,
               placeholder: "Example: Madison"
 
             },
             
             {
-              layer: layerWards,
-              searchFields: ["LABEL"],
-              displayField: "LABEL",
+              layer: layerSchools,
+              searchFields: ["SDNM"],
+              displayField: "SDNM",
               //suggestionTemplate: "{Name}, Party: {Party}",
               exactMatch: false,
-              outFields: ["LABEL"],
-              placeholder: "Example: ADAMS",
-              name: "Wards",
+              outFields: ["SDNM"],
+              placeholder: "Example: D C Everest",
+              name: "School District",
 
             },
           ]
@@ -1045,7 +1094,7 @@
         <h3>Wisconsin Voting Districts</h3>
         Every 10 years, as a result of the U.S. Census, Wisconsin has to complete the redistricting process. When ballots are created for each election, the races are determined by different districts.
         <br><br>
-        To get started, click on the specific district information that you want to see. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click on the eye icon. For those districts that are grayed out, zoom to appropriate level to be able to see them.
+        To get started, click on the specific district information that you want to see by clicking the Expand District List button. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click on the eye icon. For those districts that are grayed out, zoom to appropriate level to be able to see them.
         
         
         <br>
