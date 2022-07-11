@@ -6,7 +6,7 @@
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
     <title>
-      Wisconsin Elections Commission District Map
+      Wisconsin Voting Districts
     </title>
 
     <link
@@ -115,6 +115,7 @@
         "esri/symbols/SimpleFillSymbol",
         "esri/symbols/SimpleMarkerSymbol",
         "esri/widgets/BasemapGallery",
+        "esri/Basemap",
         "esri/widgets/Legend",
         "esri/widgets/FeatureTemplates",
         "esri/config",
@@ -144,6 +145,7 @@
         SimpleFillSymbol,
         SimpleMarkerSymbol,
         BasemapGallery,
+        Basemap,
         Legend,
         FeatureTemplates,
         esriConfig,
@@ -159,14 +161,35 @@
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_CongressionalDistricts/FeatureServer/0",
           //outFields: ["*"],
           opacity: 0.6,
-          title: "Congressional Districts",
+          title: "Congressional",
           visible: false,
           popupTemplate: {
             // autocasts as new PopupTemplate()
             title: "Congressional District: {CON2021}",
             content: "Active as March, 2022",
             overwriteActions: false
-          }
+          },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Arial",
+                  size: 12,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.CON2021"
+              }
+            }
         });
           
         // add the park groves featurelayer
@@ -181,7 +204,28 @@
             title: "Senate District: {SEN2021}",
             content: "Active as April 16, 2022",
             overwriteActions: false
-          }
+          },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Arial",
+                  size: 10,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.SEN2021"
+              }
+            }
         });
         
         // add the park roads featurelayer
@@ -196,7 +240,28 @@
             title: "Assembly District: {ASM2021}",
             content: "Active as April 16, 2022",
             overwriteActions: false
-          }
+          },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Arial",
+                  size: 10,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.ASM2021"
+              }
+            }
         });
           
         // add the park fire history featurelayer
@@ -231,6 +296,55 @@
               //labelPlacement: "above-center",
               labelExpressionInfo: {
                 expression: "$feature.SUPERID"
+              }
+            }
+        });
+          
+        // add the park trails featurelayer
+        var layerSanitary = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SanitaryDistricts/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "Elected Sanitary",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Sanitary District",
+            content: "District Name: {SanName} </br> Code: {SanCode}",
+            overwriteActions: false
+          },
+          minScale: 400000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 2,
+                  color: "orange"
+                }
+              }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "orange",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.SanName"
               }
             }
         });
@@ -286,7 +400,7 @@
         
         // add the park trails featurelayer
         var layerDistrictCombos = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Redistricting_DCs/FeatureServer/0",
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_DistrictCombos/FeatureServer/0",
           //outFields: ["*"],
           opacity: 0.6,
           title: "District Combos",
@@ -386,7 +500,7 @@
         var layerMunis = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Municipality_CombinedCounty/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.6,
+          opacity: 0.8,
           title: "Municipalities",
           visible: true,
           minScale: 600000,
@@ -485,8 +599,8 @@
               
         // Create the Map
         const map = new Map({
-          basemap: "topo-vector",
-          layers: [layerCongressional, layerSenate, layerAssembly, layerCountySup, layerSchools, layerWards, layerDistrictCombos,  layerMunis, layerCounties]
+          basemap: "gray-vector",
+          layers: [layerMunis, layerCounties, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
         });
           
         let editor, features, editExpand, filterLayerView, queryLayerView;
@@ -527,7 +641,7 @@
         const view = new MapView({
           container: "viewDiv",
           map: map,
-          zoom: 7,
+          zoom: 6,
           center: [-89.5, 44.60]
         });
           
@@ -691,7 +805,7 @@
           
         
         let tooltipExpand = new Expand({
-              expandIconClass: "esri-icon-comment",
+              expandIconClass: "esri-icon-question",
               expandTooltip: "Expand Tooltip",
               view: view,
               expanded: true,
@@ -745,13 +859,17 @@
 //          view: view,  // The view that provides access to the map's "streets-vector" basemap
 //          expandIconClass: "esri-icon-basemap"  // Allows for toggling to the "hybrid" basemap
 //        });
+        var basemapGallery = new BasemapGallery({
+            view: view,
+            source: [Basemap.fromId("gray-vector"), Basemap.fromId("satellite"), Basemap.fromId("streets-vector")] // autocasts to LocalBasemapsSource
+        });
           
         let basemapExpand = new Expand({
               expandIconClass: "esri-icon-basemap",
               expandTooltip: "Expand Basemap Gallery",
               view: view,
               expanded: false,
-              content: new BasemapGallery({ view }),
+              content: basemapGallery,
               mode: "floating",
               group: "top-left"
             });
