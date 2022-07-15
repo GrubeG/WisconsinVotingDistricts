@@ -121,6 +121,9 @@
         "esri/config",
         "esri/widgets/Print",
         "esri/widgets/Slider",
+        "esri/layers/WebTileLayer",
+        "esri/layers/VectorTileLayer",
+        
         
           
         "dojo/on",
@@ -151,10 +154,16 @@
         esriConfig,
         Print,
         Slider,
+        WebTileLayer,
+        VectorTileLayer,
         on, dom, domConstruct
       ) => {
           
         esriConfig.apiKey = "AAPKd7a5f0028e3d432faec9c8e03740f0d8ntcrv-SGuCaGKZrLrQxv4azO6TaiERQO5QwoBDUznyrB6hxLK2EZe7oCwvq7bldk";
+          
+        // *****************************************************
+        // Define Feature Layers to be added to the map
+        // *****************************************************
           
         // add the park outline featurelayer
         var layerCongressional = new FeatureLayer({
@@ -512,7 +521,7 @@
                 color: null,
                 outline: {  // autocasts as new SimpleLineSymbol()
                   width: 2,
-                  color: "gray"
+                  color: "#AFAFAF"
                 }
               }
             },
@@ -520,8 +529,8 @@
               // autocasts as new LabelClass()
               symbol: {
                 type: "text", // autocasts as new TextSymbol()
-                color: "gray",
-                haloColor: "white",
+                color: "#4B4B4C",
+                haloColor: "#e0e0e0",
                 haloSize: 1,
                 font: {
                   // autocast as new Font()
@@ -596,10 +605,50 @@
 //            overwriteActions: false
 //          }
         });
+        
+        // *****************************************************
+        // add Custom Basemap from Vector Tile Layer
+        // *****************************************************
+          
+        // Light Gray
+        var lightGrayLayer = new VectorTileLayer({
+          // URL to the style of vector tiles
+          url: "https://uw-mad.maps.arcgis.com/sharing/rest/content/items/b941c095c56c44b98c699550038bc1f0/resources/styles/root.json"
+          
+        });
+
+        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
+        //the image in the BasemapToggle widget.
+        var lightGrayBasemap = new Basemap({
+          baseLayers: [lightGrayLayer],
+          title: "Light Gray",
+          //id: "terrain",
+          thumbnailUrl: "img/LightGray_NoLabels.png",
+        });  
+          
+        // Topo Layer
+        var topoLayer = new VectorTileLayer({
+          // URL to the style of vector tiles
+          url: "https://uw-mad.maps.arcgis.com/sharing/rest/content/items/7fc191a9ff7b48df863ef038909a6a8a/resources/styles/root.json"
+          
+        });
+
+        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
+        //the image in the BasemapToggle widget.
+        var topoBasemap = new Basemap({
+          baseLayers: [topoLayer],
+          title: "Topographic",
+          //id: "terrain",
+          thumbnailUrl: "img/Topo_NoLabels.png",
+        }); 
+        
+        // *****************************************************
+        // Define the Map Display
+        // *****************************************************
               
         // Create the Map
         const map = new Map({
-          basemap: "gray-vector",
+          basemap: lightGrayBasemap,
           layers: [layerMunis, layerCounties, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
         });
           
@@ -855,13 +904,26 @@
         // and add it to the top-right corner of the view.
         // *****************************************************
         
-//        let basemapGallery = new BasemapGallery({
-//          view: view,  // The view that provides access to the map's "streets-vector" basemap
-//          expandIconClass: "esri-icon-basemap"  // Allows for toggling to the "hybrid" basemap
+          
+//        // Typical usage
+//        var vtlLayer = new VectorTileLayer({
+//          // URL to the style of vector tiles
+//          url: "https://uw-mad.maps.arcgis.com/sharing/rest/content/items/b941c095c56c44b98c699550038bc1f0/resources/styles/root.json"
+//          
 //        });
+//
+//        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
+//        //the image in the BasemapToggle widget.
+//        var vtlBasemap = new Basemap({
+//          baseLayers: [vtlLayer],
+//          title: "Light Gray",
+//          //id: "terrain",
+//          //thumbnailUrl: "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
+//        });  
+          
         var basemapGallery = new BasemapGallery({
             view: view,
-            source: [Basemap.fromId("gray-vector"), Basemap.fromId("satellite"), Basemap.fromId("streets-vector")] // autocasts to LocalBasemapsSource
+            source: [lightGrayBasemap, topoBasemap, Basemap.fromId("arcgis-imagery"), Basemap.fromId("arcgis-imagery-standard")] // autocasts to LocalBasemapsSource
         });
           
         let basemapExpand = new Expand({
