@@ -48,49 +48,12 @@
         width: 120px;
       }
         
-     #pois-filter {
-        height: 120px;
-        width: 100%;
-        visibility: hidden;
-      }
-
-      .poi-item {
-        width: 125px;
-        padding: 13px;
-        text-align: center;
-        vertical-align: baseline;
-        cursor: pointer;
-        height: 40px;
-        font-size: 13px;
-      }
-
-      .poi-item:focus {
-        background-color: dimgrey;
-      }
-
-      .poi-item:hover {
-        background-color: dimgrey;
-      }
-        
       div.image::before {
         content:url("img/WEC_Logo.png");
       }
       
         
-    .esri-editor .esri-item-list__scroller {
-        max-height: 100%;
-        max-width: 250px;
-      }
-        
-      .esri-view-height-small .esri-expand .esri-widget--panel, .esri-view-height-small .esri-expand .esri-widget--panel-height-only, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel-height-only {
-          max-height: 650px;
-          min-height: 60%;
-          max-width: 250px;
-      }
-      .esri-ui .esri-editor .esri-item-list__scroller {
-          max-height: 100%;
-          max-width: 250px;
-      }
+
         
         
     
@@ -313,7 +276,7 @@
         var layerSanitary = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SanitaryDistricts/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.6,
+          opacity: 1,
           title: "Elected Sanitary",
           visible: false,
           popupTemplate: {
@@ -331,7 +294,7 @@
                 color: null,
                 outline: {  // autocasts as new SimpleLineSymbol()
                   width: 2,
-                  color: "orange"
+                  color: "#ffaf42"
                 }
               }
             },
@@ -339,7 +302,7 @@
               // autocasts as new LabelClass()
               symbol: {
                 type: "text", // autocasts as new TextSymbol()
-                color: "orange",
+                color: "#fe6e00",
                 haloColor: "white",
                 haloSize: 1,
                 font: {
@@ -362,7 +325,7 @@
         var layerWards = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Wards/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.6,
+          opacity: 1,
           title: "Wards",
           visible: false,
           popupTemplate: {
@@ -411,7 +374,7 @@
         var layerDistrictCombos = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_DistrictCombos/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.6,
+          opacity: 1,
           title: "District Combos",
           visible: false,
           popupTemplate: {
@@ -455,12 +418,39 @@
               }
             }
         });
+        
+       
+        function schoolFillSymbol(value, color) {
+            return {
+              "value": value,
+              "symbol": {
+                "color": null,
+                "type": "simple-fill",
+                "style": "solid",
+                "outline": {
+                  width: 2,
+                  color: color
+                }
+              },
+              "label": value
+            };
+        }  
           
-        // add the park trails featurelayer
+        //Define the schools display renderer
+        var schoolRenderer = {
+        type: "unique-value",
+        field: "TYPE",
+        uniqueValueInfos: [
+          schoolFillSymbol("Unified", "#f603a3"),
+          schoolFillSymbol("Elementary", "#ca8dfd"),
+        ]
+      };
+          
+        // add the schools featurelayer
         var layerSchools = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SchoolDistricts/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.6,
+          opacity: 1,
           title: "School Districts",
           visible: false,
           popupTemplate: {
@@ -471,22 +461,12 @@
           },
           minScale: 600000,
           maxScale: 0,
-          renderer: {
-              type: "simple",  // autocasts as new SimpleRenderer()
-              symbol: {
-                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
-                color: null,
-                outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 2,
-                  color: "green"
-                }
-              }
-            },
+          renderer: schoolRenderer, 
           labelingInfo: {
               // autocasts as new LabelClass()
               symbol: {
                 type: "text", // autocasts as new TextSymbol()
-                color: "green",
+                color: "#f603a3",
                 haloColor: "white",
                 haloSize: 1,
                 font: {
@@ -504,32 +484,50 @@
               }
             }
         });
+        
+        //set municipality fills
+        function muniFillSymbol(value, color, outline) {
+            return {
+              "value": value,
+              "symbol": {
+                "color": color,
+                "type": "simple-fill",
+                "style": "solid",
+                "outline": {
+                  width: 2,
+                  color: outline
+                }
+              },
+              "label": value
+            };
+        }  
+          
+        //Define the schools display renderer
+        var muniRenderer = {
+        type: "unique-value",
+        field: "MuniType",
+        uniqueValueInfos: [
+          muniFillSymbol("Town", null, "#D3D3D3"),
+          muniFillSymbol("Village", null, "#D3D3D3"),
+          muniFillSymbol("City", null, "#D3D3D3")
+        ]
+      };
           
         // add the park trails featurelayer
         var layerMunis = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Municipality_CombinedCounty/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.8,
+          opacity: 1.0,
           title: "Municipalities",
           visible: true,
           minScale: 600000,
           maxScale: 0,
-          renderer: {
-              type: "simple",  // autocasts as new SimpleRenderer()
-              symbol: {
-                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
-                color: null,
-                outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 2,
-                  color: "#AFAFAF"
-                }
-              }
-            },
+          renderer: muniRenderer,
           labelingInfo: {
               // autocasts as new LabelClass()
               symbol: {
                 type: "text", // autocasts as new TextSymbol()
-                color: "#4B4B4C",
+                color: "#333333",
                 haloColor: "#e0e0e0",
                 haloSize: 1,
                 font: {
@@ -569,7 +567,7 @@
                 type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
                 color: null,
                 outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 2.25,
+                  width: 2.5,
                   color: "black"
                 }
               }
@@ -622,6 +620,7 @@
         var lightGrayBasemap = new Basemap({
           baseLayers: [lightGrayLayer],
           title: "Light Gray",
+          
           //id: "terrain",
           thumbnailUrl: "img/LightGray_NoLabels.png",
         });  
