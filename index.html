@@ -52,7 +52,40 @@
         content:url("img/WEC_Logo.png");
       }
       
+     .esri-layer-list .esri-item-list__scroller {
+        max-height: 100%;
+        max-width: 250px;
+      }
         
+      .esri-view-height-small .esri-expand .esri-widget--panel, .esri-view-height-small .esri-expand .esri-widget--panel-height-only, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel-height-only {
+          max-height: 650px;
+          min-height: 60%;
+          max-width: 250px;
+      }
+      .esri-ui .esri-layer-list .esri-item-list__scroller {
+          max-height: 100%;
+          max-width: 250px;
+      }
+    
+      .esri-layer-list__item {
+        background-color: $background-color;
+        border-bottom: 1px solid $border-color;
+        position: relative;
+        overflow: hidden;
+        list-style: none;
+        margin: $cap-spacing--quarter 0;
+        padding: 0;
+        @include sortableChosen("esri-layer-list--chosen");
+      }
+        
+      .esri-layer-list__item-container {
+        border-left: $border-size--active solid transparent;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 5px 5px 5px 5px;
+        transition: border-color 250ms ease-in-out;
+      }
 
         
         
@@ -127,8 +160,11 @@
         // *****************************************************
         // Define Feature Layers to be added to the map
         // *****************************************************
-          
-        // add the park outline featurelayer
+        
+        // *****************************************************
+        // add Congressional Feature Layer
+        // *****************************************************  
+    
         var layerCongressional = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_CongressionalDistricts/FeatureServer/0",
           //outFields: ["*"],
@@ -163,6 +199,10 @@
               }
             }
         });
+          
+        // *****************************************************
+        // add Senate Feature Layer
+        // *****************************************************
           
         // add the park groves featurelayer
         var layerSenate = new FeatureLayer({
@@ -199,6 +239,10 @@
               }
             }
         });
+          
+        // *****************************************************
+        // add Assembly Feature Layer
+        // *****************************************************
         
         // add the park roads featurelayer
         var layerAssembly = new FeatureLayer({
@@ -236,6 +280,10 @@
             }
         });
           
+        // *****************************************************
+        // add County Supervisory Feature Layer
+        // *****************************************************
+          
         // add the park fire history featurelayer
         var layerCountySup = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_CountySup_Districts/FeatureServer/0",
@@ -272,6 +320,10 @@
             }
         });
           
+        // *****************************************************
+        // add Sanitary Districts Feature Layer
+        // *****************************************************
+          
         // add the park trails featurelayer
         var layerSanitary = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SanitaryDistricts/FeatureServer/0",
@@ -302,8 +354,8 @@
               // autocasts as new LabelClass()
               symbol: {
                 type: "text", // autocasts as new TextSymbol()
-                color: "#fe6e00",
-                haloColor: "white",
+                color: "#333333",
+                haloColor: "#ffaf42",
                 haloSize: 1,
                 font: {
                   // autocast as new Font()
@@ -320,6 +372,10 @@
               }
             }
         });
+          
+        // *****************************************************
+        // add Wards Feature Layer
+        // *****************************************************
           
         // add the park trails featurelayer
         var layerWards = new FeatureLayer({
@@ -369,6 +425,10 @@
               }
             }
         });
+          
+        // *****************************************************
+        // add District Combos Feature Layer
+        // *****************************************************
         
         // add the park trails featurelayer
         var layerDistrictCombos = new FeatureLayer({
@@ -414,10 +474,120 @@
               minScale: 200000,
               //labelPlacement: "above-center",
               labelExpressionInfo: {
-                expression: "$feature.WARDID + TextFormatting.NewLine + $feature.SDNM + TextFormatting.NewLine + $feature.SanName"
+                expression: "$feature.LblWard + TextFormatting.NewLine + $feature.SDNM + $feature.LblSD + TextFormatting.NewLine + $feature.LblSan"
               }
             }
         });
+          
+        // *****************************************************
+        // add Technicial Colleges Feature Layer
+        // *****************************************************
+        
+        // add the park trails featurelayer
+        var layerTechCollege = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Technical_College_Regions/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1,
+          title: "Tech College",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Technical College Regions",
+            content: "Technical College: {WTC_REGION}",
+            overwriteActions: false
+          },
+          minScale: 5000000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.25,
+                  color: "#00FF00"
+                }
+              }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "#00FF00",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.WTC_REGION"
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add Multi-Jurisdictional Judge Feature Layer
+        // *****************************************************
+        
+        // add the park trails featurelayer
+        var layerMJJ = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_MultiJurisdictionalJudge/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1,
+          title: "Multi-Jurisdiction Judge",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Multi-Jurisdictional Judge",
+            content: "Name: {MJJNAME} </br> Code: {MJJCode}",
+            overwriteActions: false
+          },
+          minScale: 600000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.25,
+                  color: "#D2B48C"
+                }
+              }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "#D2B48C",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 600000,
+              //labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.MJJName"
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add Schools Feature Layer
+        // *****************************************************
         
        
         function schoolFillSymbol(value, color) {
@@ -484,6 +654,10 @@
               }
             }
         });
+          
+        // *****************************************************
+        // add Municipalities Feature Layer
+        // *****************************************************
         
         //set municipality fills
         function muniFillSymbol(value, color, outline) {
@@ -554,7 +728,10 @@
 //          }
         });
           
-        // add the park trails featurelayer
+        // *****************************************************
+        // add Counties Feature Layer
+        // *****************************************************
+        
         var layerCounties = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Counties/FeatureServer/0",
           //outFields: ["*"],
@@ -648,7 +825,7 @@
         // Create the Map
         const map = new Map({
           basemap: lightGrayBasemap,
-          layers: [layerMunis, layerCounties, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
+          layers: [layerMunis, layerCounties, layerMJJ, layerTechCollege, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
         });
           
         let editor, features, editExpand, filterLayerView, queryLayerView;
@@ -697,7 +874,7 @@
         
         view.popup.dockOptions = {
               // Disable the dock button so users cannot undock the popup
-              position: "bottom-right",
+              position: "bottom-left",
         };
           
         // *****************************************************
