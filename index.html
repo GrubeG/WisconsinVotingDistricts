@@ -24,7 +24,7 @@
         margin: 0;
         height: 100%;
         width: 100%;
-      }
+      } 
 
       #info {
         height: 100%;
@@ -40,12 +40,6 @@
         width: 250px;
         text-align: center;
         
-      }
-        
-      #query-type {
-        padding: 8px;
-        border-radius: 5px;
-        width: 120px;
       }
         
       div.image::before {
@@ -86,8 +80,53 @@
         padding: 5px 5px 5px 5px;
         transition: border-color 250ms ease-in-out;
       }
-
         
+      .esri-icon-non-visible::before {
+      content: "\e610";
+      }
+      .esri-icon-visible::before {
+      content: "\e611";
+      }
+
+      #queryDiv {
+        background-color: white;
+        padding: 14px;
+        border-radius: 5px;
+        width: 240px;
+        margin: 5px;
+        bottom: 15px;
+        right: 10px;
+        font-size: 14px;
+      }
+        
+
+      .geometry-options {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .geometry-button {
+        flex: 1;
+        border-style: solid;
+        border-width: 1px;
+        border-image: none;
+      }
+
+      .geometry-button-selected {
+        background: #4c4c4c;
+        color: #fff;
+      }
+        
+      .options {
+        max-width: 260px;
+        width: 100%;
+        height: 25px;
+      }
+
+      #bufferNum {
+        width: 90%;
+        margin: 2.5em auto 0;
+      }
         
     
         
@@ -119,6 +158,8 @@
         "esri/widgets/Slider",
         "esri/layers/WebTileLayer",
         "esri/layers/VectorTileLayer",
+        "esri/layers/support/FeatureEffect",
+        "esri/rest/support/Query",
         
         
           
@@ -152,6 +193,8 @@
         Slider,
         WebTileLayer,
         VectorTileLayer,
+        FeatureEffect,
+        Query,
         on, dom, domConstruct
       ) => {
           
@@ -193,7 +236,7 @@
               },
               maxScale: 0,
               minScale: 5000000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.CON2021"
               }
@@ -233,7 +276,7 @@
               },
               maxScale: 0,
               minScale: 5000000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.SEN2021"
               }
@@ -273,7 +316,7 @@
               },
               maxScale: 0,
               minScale: 5000000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.ASM2021"
               }
@@ -313,7 +356,7 @@
               },
               maxScale: 0,
               minScale: 600000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.SUPERID"
               }
@@ -324,7 +367,7 @@
         // add Sanitary Districts Feature Layer
         // *****************************************************
           
-        // add the park trails featurelayer
+        // add the sanitary featurelayer
         var layerSanitary = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SanitaryDistricts/FeatureServer/0",
           //outFields: ["*"],
@@ -366,7 +409,7 @@
               },
               maxScale: 0,
               minScale: 300000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.SanName"
               }
@@ -377,7 +420,7 @@
         // add Wards Feature Layer
         // *****************************************************
           
-        // add the park trails featurelayer
+        // add the wards featurelayer
         var layerWards = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Wards/FeatureServer/0",
           //outFields: ["*"],
@@ -419,7 +462,7 @@
               },
               maxScale: 0,
               minScale: 300000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.WardLbl"
               }
@@ -430,7 +473,7 @@
         // add District Combos Feature Layer
         // *****************************************************
         
-        // add the park trails featurelayer
+        
         var layerDistrictCombos = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_DistrictCombos/FeatureServer/0",
           //outFields: ["*"],
@@ -472,7 +515,7 @@
               },
               maxScale: 0,
               minScale: 200000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.LblWard + TextFormatting.NewLine + $feature.SDNM + $feature.LblSD + TextFormatting.NewLine + $feature.LblSan"
               }
@@ -483,7 +526,7 @@
         // add Technicial Colleges Feature Layer
         // *****************************************************
         
-        // add the park trails featurelayer
+        
         var layerTechCollege = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Technical_College_Regions/FeatureServer/0",
           //outFields: ["*"],
@@ -525,7 +568,7 @@
               },
               maxScale: 0,
               minScale: 5000000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.WTC_REGION"
               }
@@ -536,7 +579,7 @@
         // add Multi-Jurisdictional Judge Feature Layer
         // *****************************************************
         
-        // add the park trails featurelayer
+        
         var layerMJJ = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_MultiJurisdictionalJudge/FeatureServer/0",
           //outFields: ["*"],
@@ -578,9 +621,9 @@
               },
               maxScale: 0,
               minScale: 600000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
-                expression: "$feature.MJJName"
+                expression: "$feature.MJJName",
               }
             }
         });
@@ -648,7 +691,7 @@
               },
               maxScale: 0,
               minScale: 400000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.SDNM + TextFormatting.NewLine + $feature.Union_HS"
               }
@@ -713,17 +756,16 @@
               },
               maxScale: 0,
               minScale: 300000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.MuniName"
               },
-              //deconflictionStrategy: "none"
             },
             labelsVisible: true,
 //          popupTemplate: {
 //            // autocasts as new PopupTemplate()
 //            title: "Municipality",
-//            content: "{MuniType} {MuniName} </br> County: {CNTY_NAME},
+//            content: "{MuniName} </br> County: {CNTY_NAME}",
 //            overwriteActions: false
 //          }
         });
@@ -759,18 +801,17 @@
                 haloSize: 1,
                 font: {
                   // autocast as new Font()
-                  family: "Merriweather",
-                  size: 8,
-                  weight: "bold"
+                  family: "sans-serif",
+                  size: 10,
+                  weight: "bold",
                 }
               },
               maxScale: 0,
               minScale: 5000000,
-              //labelPlacement: "above-center",
+              deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
                 expression: "$feature.CNTY_NAME"
               },
-              //deconflictionStrategy: "none"
             },
             labelsVisible: true,
 //          popupTemplate: {
@@ -828,7 +869,7 @@
           layers: [layerMunis, layerCounties, layerMJJ, layerTechCollege, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
         });
           
-        let editor, features, editExpand, filterLayerView, queryLayerView;
+        let editor, features, editExpand;
           
           
         // *****************************************************
@@ -970,18 +1011,24 @@
             //const visibleLayer = layerCounties.visible;
 
             // Capture the action id.
-            const id = event.action.id;
-
+            const id = event.action.id; 
             
+            const logo = event.action.className
+            console.log(logo)
+            
+            
+
                 
             //toggle labels for each layer on and off
             if (id === "labels") {
               if (event.item.layer.labelsVisible  === false) {
                 event.item.layer.labelsVisible = true;
-                console.log(event.item.layer.labelsVisible);
+                //event.action.className === "esri-icon-close";
+                  console.log(logo)
               } else {
-                event.item.layer.labelsVisible = false;
-                console.log(event.item.layer.labelsVisible);
+                event.item.layer.labelsVisible = false
+                //event.action.className === "esri-icon-close";
+        
               }
             }
               
@@ -1008,7 +1055,7 @@
           layerListExpand.watch("expanded", () => {
             if (layerListExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Click the layer name or eye icon to turn that layer on/off.";
+              fieldNameText.textContent = "Click the layer name or checkbox to turn that layer on/off.";
             }
             //clear the filters when user closes the expand widget  
             if (!layerListExpand.expanded) {
@@ -1247,169 +1294,218 @@
 //        // Create the Query widget with the associated actions
 //        // and add it to the top-right corner of the view.
 //        // *****************************************************
+          
+          
+          let layerMunisView = null;
+          let layerWardsView = null;
+          let highlight = null;
+          let query = null;
+          let geometry = null;
+          let graphics = null;
+          let handler
+          
+            //sets up interface for query
+            const queryElement = document.getElementById("queryDiv");
+            //turn on query tool
+            const turnOnQueryElement = document.getElementById("point-geometry-button");
+            //turn off query tool
+            const removeQueryElement = document.getElementById("clearFilter");
+          
+          // click event handler for query choices
+          turnOnQueryElement.addEventListener("click", queryLayers, true);
+          
+          //remove the event listener
+          removeQueryElement.addEventListener("click", clearFilter, true);
+            
+          
+          
+          
+          function clearFilter() {
+             
+              highlight.remove();
+              graphics = null;
+              layerWardsView.filter = null;
+              layerMunisView.filter = null;
+              queryLayers = null;
+              //layerView = null;      
+          }
+          
+          // set the geometry filter on the visible FeatureLayerView
+        function updateFilter() {
+          const featureFilter = {
+            spatialRelationship: selectedFilter
+          };
+
+          if (layerWardsView) {
+            if (layerWardsView.FilterSelected) {
+              layerWardsView.filter = featureFilter;
+            } else {
+              layerWardsView.filter = null;
+            }
+          }
+        }
+          
+          // get the selected spatialRelationship
+            let selectedFilter = "contains";
+            document
+              .getElementById("relationship-select")
+              .addEventListener("change", (event) => {
+                const select = event.target;
+                selectedFilter = select.options[select.selectedIndex].value;
+                updateFilter();
+              });
 //        
-//        
-//
-//        // additional query fields initially set to null for basic query
-//        let distance = 0.5;
-//        let units = "miles";
-//
-//        //create graphic for mouse point click
-//        const pointGraphic = new Graphic({
-//          symbol: {
-//            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-//            color: [0, 0, 139],
-//            outline: {
-//              color: [255, 255, 255],
-//              width: 1.5
+          function queryLayers (Map, FeatureLayer, MapView) {
+          
+          view.whenLayerView(layerMunis).then(function(layerView) {
+             layerMunisView = layerView;
+          });
+
+          view.whenLayerView(layerWards).then(function(layerView) {
+             layerWardsView = layerView;
+          });
+              
+          
+
+
+          var handler = view.on("click", (event) => {
+            const query = {
+              geometry: event.mapPoint,
+              returnGeometry: true,
+              //spatialRelationship: "intersects",
+            };
+            layerMunisView.queryFeatures(query).then((results) => {
+              if (results.features.length > 0) {
+                if (highlight) {
+                  highlight.remove();
+                }
+                // highlight query results
+                highlight = layerMunisView.highlight(results.features);
+
+                layerWardsView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: selectedFilter,
+                  distance: 2 * view.resolution
+                };
+                
+                
+              }
+             });
+             //remove the click on event
+             handler.remove();
+              
+          });
+
+//          function drawPoint() {
+//            if (highlight) {
+//              highlight.remove();
 //            }
-//          }
-//        });
+//            const action = draw.create("point");
 //
-//        // Create graphic for distance buffer
-//        const bufferGraphic = new Graphic({
-//          symbol: {
-//            type: "simple-fill", // autocasts as new SimpleFillSymbol()
-//            color: [173, 216, 230, 0.2],
-//            outline: {
-//              // autocasts as new SimpleLineSymbol()
-//              color: [255, 255, 255],
-//              width: 1
-//            }
-//          }
-//        });
-//
-//        // when query type changes, set appropriate values
-//        var queryOpts = document.getElementById("query-type");
-//
-//        queryOpts.addEventListener("change", () => {
-//          switch (queryOpts.value) {
-//            // values set for distance query
-//            case "OneMile":
-//              distance = 1;
-//              units = "miles";
-//              break;
-//            case "TwoMiles":
-//              distance = 2;
-//              units = "miles";
-//              break;
-//            case "FiveMiles":
-//              distance = 5;
-//              units = "miles";
-//              break;
-//            default:
-//              // Default set to basic query
-//              distance = 0.5;
-//              units = "miles";
-//          }
-//        });
-//        
-//
-//        function queryFeatures(screenPoint) {
-//          const point = view.toMap(screenPoint);
-//          layerCounties.queryFeatures({
-//              geometry: point,
-//              // distance and units will be null if basic query selected
-//              distance: distance,
-//              units: units,
-//              spatialRelationship: "intersects",
-//              returnGeometry: false,
-//              returnQueryGeometry: true,
-//              outFields: ["*"]
-//            })
-//            .then((featureSet) => {
-//              // set graphic location to mouse pointer and add to mapview
-////              pointGraphic.geometry = point;
-////              view.graphics.add(pointGraphic);
-//              
-//              // open popup of query result
-//              view.popup.open({
-//                location: point,
-//                features: featureSet.features,
-//                featureMenuOpen: true
+//            // Give a visual feedback to users as they move the pointer over the view
+//            action.on("cursor-update", function (evt) {
+//              view.graphics.removeAll();
+//              drawPnt = new Point({
+//                x: evt.coordinates[0],
+//                y: evt.coordinates[1],
+//                spatialReference: view.spatialReference
 //              });
-//              view.popup.dockOptions = {
-//                  // Change position of the default docking
-//                  position: "bottom-right",
-//                };
-//              // The popup will automatically be dockEnabled when made visible
-//              view.popup.dockEnabled = true;
-//              
-//              if (featureSet.queryGeometry) {
-//                bufferGraphic.geometry = featureSet.queryGeometry;
-//                view.graphics.add(bufferGraphic);
-//                view.goTo(bufferGraphic);
+//              graphic = new Graphic({
+//                geometry: drawPnt,
+//                symbol: sym
+//              });
+//              view.graphics.add(graphic);
+//              if(ctrlKey && !evt.native.ctrlKey){
+//                draw.reset();
+//                view.graphics.removeAll();
+//                selectMunis();
 //              }
 //            });
+//
+//            action.on("draw-complete", function (evt) {
+//              if (evt.native.ctrlKey) {
+//                ctrlKey = true;
+//              }else{
+//                ctrlKey = false;
+//              }
+//              drawPnt = new Point({
+//                x: evt.coordinates[0],
+//                y: evt.coordinates[1],
+//                spatialReference: view.spatialReference
+//              });
+//
+//              graphic = new Graphic({
+//                geometry: drawPnt,
+//                symbol: sym
+//              });
+//              pntGraphics.add(graphic);
+//              if (evt.native.ctrlKey) {
+//                drawPoint();
+//              } else {
+//                view.graphics.removeAll();
+//                selectMunis();
+//              }
+//            });
+//            view.focus();
+//          };
+//
+//          function selectMunis(){
+//            let mp = new Multipoint({
+//              spatialReference: view.spatialReference
+//            });
+//            let pntArray = pntGraphics.graphics.map(function(gra){
+//              mp.addPoint(gra.geometry);
+//            });
+//
+//            const query = {
+//              geometry: mp,
+//              outFields: ["*"],
+//              outSpatialReference: view.spatialReference,
+//              returnGeometry: true
+//            };
+//            // let query = layerMunis.createQuery();
+//            // query.geometry = mp;
+//            // query.outSpatialReference = view.spatialReference;
+//            // query.returnGeometry = true;
+//            layerMunis.queryFeatures(query)
+//            .then(function(results){
+//              const graphics = results.features;
+//              // remove existing highlighted features
+//              if (highlight) {
+//                highlight.remove();
+//              }
+//
+//              // highlight query results
+//              highlight = layerMunisView.highlight(graphics);
+//              pntGraphics.removeAll();
+//            }).catch(function(err){
+//              console.error(err);
+//            })
+//          }
+      };
+          
+      
+          
+//        // set an attribute filter on filter layer view
+//        // to display the warnings issued in that poi
+//        function filterBypoi(event) {
+//          const selectedpoi = event.target.getAttribute("data-poi");
+//          layerMunisView.filter = {
+//            where: "POITYPE = '" + selectedpoi + "'"
+//          };
 //        }
-//          
-//        let queryExpand = new Expand({
-//            view: view,
-//            content: queryOpts,
-//            mode: "floating",
-//            expandTooltip: "Expand Query",
-//            expandIconClass: "esri-icon-review",
-//            group: "top-right"
-//          });
-//          //start query tool when user clicks expand button
-//          
-//          queryExpand.watch("expanded", () => {
-//            if (queryExpand.expanded) {
-//                mouseEvtHandler = view.on("click", (event) => {
-//                    view.graphics.remove(pointGraphic);
-//                    if (view.graphics.includes(bufferGraphic)) {
-//                        view.graphics.remove(bufferGraphic);
-//                    }
-//                    
-//                    queryFeatures(event);
-//                });
-//                var fieldNameText = document.getElementById('info');
-//                fieldNameText.textContent = "Select a buffer distance and click a location on the map to return the Points of Interest within that distance.";
-//            }
-//            //clear the query when user closes the expand widget
-//            if (!queryExpand.expanded) {
-//                mouseEvtHandler.remove();
-//                mouseEvtHandler = null;
-//                view.graphics.remove(pointGraphic);
-//                    if (view.graphics.includes(bufferGraphic)) {
-//                        view.graphics.remove(bufferGraphic);
-//                    }
-//                var fieldNameText = document.getElementById('info');
-//                fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-//            }
-//          }); 
-          
-        // *****************************************************
-        // Create the Filter widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-          
-        const poisNodes = document.querySelectorAll(`.poi-item`);
-        const poisElement = document.getElementById("poi-filter");
 
-        // click event handler for pois choices
-        poisElement.addEventListener("click", filterBypoi);
-
-        // set an attribute filter on filter layer view
-        // to display the warnings issued in that poi
-        function filterBypoi(event) {
-          const selectedpoi = event.target.getAttribute("data-poi");
-          filterLayerView.filter = {
-            where: "POITYPE = '" + selectedpoi + "'"
-          };
-        }
-
-        view.whenLayerView(layerCounties).then((layerView) => {
+        //view.whenLayerView(layerMunis).then((layerView) => {
           // flash filter warnings layer loaded
           // get a reference to the filter warnings layerview
-          filterLayerView = layerView;
+          //layerMunisView = layerView;
 
           // set up UI items
-          poisElement.style.visibility = "visible";
+          //queryElement.style.visibility = "visible";
         
-          let poisExpand = new Expand({
+          let queryExpand = new Expand({
             view: view,
-            content: poisElement,
+            content: queryElement,
             mode: "floating",
             expandTooltip: "Expand Filter",
             expandIconClass: "esri-icon-filter",
@@ -1417,22 +1513,22 @@
           });
             
           //add instruction information when user expands the widget
-          poisExpand.watch("expanded", () => {
-            if (poisExpand.expanded) {
+          queryExpand.watch("expanded", () => {
+            if (queryExpand.expanded) {
               var fieldNameText = document.getElementById('info');
               fieldNameText.textContent = "Filter view of data layers. Closing the Filter tool will reset to default.";
             }
             //clear the filters when user closes the expand widget  
-            if (!poisExpand.expanded) {
-              filterLayerView.filter = null;
+            if (!queryExpand.expanded) {
+              //queryElement.style.visibility = "hidden";
               var fieldNameText = document.getElementById('info');
               fieldNameText.textContent = "Select a tool on the right to use that specific function.";
             }
           });
-          //view.ui.add(poisExpand, "top-right");
-          view.ui.add([infoToolbarExpand, editExpand, legendExpand, searchExpand, poisExpand, layerListExpand], "top-right");
+          //view.ui.add(queryExpand, "top-right");
+          view.ui.add([infoToolbarExpand, editExpand, legendExpand, searchExpand, queryExpand, layerListExpand], "top-right");
             
-        });
+        //});
           
         
       });
@@ -1450,28 +1546,52 @@
         <h3>Wisconsin Voting Districts</h3>
         Every 10 years, as a result of the U.S. Census, Wisconsin has to complete the redistricting process. When ballots are created for each election, the races are determined by different districts.
         <br><br>
-        To get started, click on the specific district information that you want to see by clicking the Expand District List button. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click on the eye icon. For those districts that are grayed out, zoom to appropriate level to be able to see them.
+        To get started, click on the specific district information that you want to see by clicking the Expand District List button. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click the checkbox. For those districts that are grayed out, zoom to appropriate level to be able to see them.
         
         
         <br>
         <h6>Created by Greg Grube for Geography 778 at UW-Madison, Summer 2022.</h6>
 
     </div>
-    <div id="poi-filter" class="esri-widget">
-      <div class="poi-item visible-poi" data-poi="Current County">Current County</div>
-      <div class="poi-item visible-poi" data-poi="Current Municipality">Current Muni</div>
-    </div>
+        
 <!--
-    <div id="optionsDiv" class="esri-widget">
-      <select id="query-type" class="esri-widget">
-        <option value="distance">1/2 Mile</option>
-        <option value="OneMile">One Mile</option>
-        <option value="TwoMiles">Two Miles</option>
-        <option value="FiveMiles">Five Miles</option>
-        
-      </select>  
-        
+    <div id="queryDiv">
+        <div id="point-button" class="esri-widget esri-widget--button esri-interactive" title="Select Countries">
+          <span class="esri-icon-map-pin"></span>
+        </div>
     </div>
 -->
+    <div id="queryDiv" class="esri-widget">
+          <b>Filter by Municipality</b><br />
+<!--
+            <br />
+          Select the layers to filter on:<br />
+          <input id="layerWardsViewFilter" type="checkbox" checked />
+          Buildings<br />
+          <input id="featureLayerViewFilter" type="checkbox" checked /> Trees<br />
+-->
+          <br />Click arrow button below, then click on a municipality to show layers only for that location:
+          <div class="geometry-options">
+            <button
+              class="esri-widget--button esri-icon-navigation geometry-button"
+              id="point-geometry-button"
+              value="point"
+              title="Select Municipality"
+            ></button>
+            
+            
+          </div>
+          <br />
+          <label for="relationship-select">Select spatial relationship:</label>
+          <select id="relationship-select" class="options">
+            <option value="contains">contains</option>
+            <option value="intersects">intersects</option>
+            </select
+          ><br /><br />
+          
+          <button class="esri-button" id="clearFilter" type="button">
+            Clear filter
+          </button>
+        </div>
   </body>
 </html>
