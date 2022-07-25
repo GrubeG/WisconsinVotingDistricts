@@ -362,6 +362,236 @@
               }
             }
         });
+        
+        // *****************************************************
+        // add Aldermanic Feature Layer
+        // *****************************************************
+        
+        const alderRenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Aldermanic Number"
+          },
+          field: "ALDERID",
+          uniqueValueInfos: [{
+            value: "01",
+            label: "01",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              width: "0px",
+              style: "solid"
+            }
+          }, {
+            value: "02",
+            label: "02",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "03",
+            label: "03",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "04",
+            label: "04",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          }, {
+            value: "05",
+            label: "05",
+            symbol: {
+              type: "simple-fill",
+              color: "#cab2d6",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "06",
+            label: "06",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffff99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "07",
+            label: "07",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "08",
+            label: "08",
+            symbol: {
+              type: "simple-fill",
+              color: "#33a02c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "09",
+            label: "09",
+            symbol: {
+              type: "simple-fill",
+              color: "#e31a1c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "10",
+            label: "10",
+            symbol: {
+              type: "simple-fill",
+              color: "#ff7f00",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "11",
+            label: "11",
+            symbol: {
+              type: "simple-fill",
+              color: "#6a3d9a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "12",
+            label: "12",
+            symbol: {
+              type: "simple-fill",
+              color: "#b15928",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "13",
+            label: "13",
+            symbol: {
+              type: "simple-fill",
+              color: "#8dd3c7",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "14",
+            label: "14",
+            symbol: {
+              type: "simple-fill",
+              color: "#80b1d3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "15",
+            label: "15",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb8072",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "16",
+            label: "16",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdb462",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "17",
+            label: "17",
+            symbol: {
+              type: "simple-fill",
+              color: "#bebada",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "18",
+            label: "18",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffed6f",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "19",
+            label: "19",
+            symbol: {
+              type: "simple-fill",
+              color: "#b3de69",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "20",
+            label: "20",
+            symbol: {
+              type: "simple-fill",
+              color: "#fccde5",
+              width: "1px",
+              style: "solid"
+            }
+          },]
+        };
+          
+        // add the park fire history featurelayer
+        var layerAldermanic = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Aldermanic_Districts/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "Aldermanic",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Aldermanic",
+            content: "Municipality: {Label} </br> Aldermanic District: {ALDERID}",
+            overwriteActions: false
+          },
+          minScale: 400000,
+          maxScale: 0,
+          renderer: alderRenderer,    
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 10,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 400000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.ALDERID"
+              }
+            }
+        });
           
         // *****************************************************
         // add Sanitary Districts Feature Layer
@@ -866,7 +1096,7 @@
         // Create the Map
         const map = new Map({
           basemap: lightGrayBasemap,
-          layers: [layerMunis, layerCounties, layerMJJ, layerTechCollege, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
+          layers: [layerMunis, layerCounties, layerMJJ, layerTechCollege, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerAldermanic, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
         });
           
         let editor, features, editExpand;
