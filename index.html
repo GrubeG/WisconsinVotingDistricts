@@ -77,7 +77,7 @@
         display: flex;
         justify-content: flex-start;
         align-items: flex-start;
-        padding: 5px 5px 5px 5px;
+        padding: 4px 4px 4px 4px;
         transition: border-color 250ms ease-in-out;
       }
         
@@ -756,11 +756,159 @@
         // add Technicial Colleges Feature Layer
         // *****************************************************
         
+        const techCollegeRenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Tech College"
+          },
+          field: "WTCR_ABV",
+          uniqueValueInfos: [{
+            value: "BH",
+            label: "Blackhawk",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              style: "solid"
+            }
+          }, {
+            value: "CV",
+            label: "Chippewa Valley",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "FV",
+            label: "Fox Valley",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              style: "solid"
+            }
+          }, {
+            value: "GW",
+            label: "Gateway",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          }, {
+            value: "LS",
+            label: "Lakeshore",
+            symbol: {
+              type: "simple-fill",
+              color: "#cab2d6",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MA",
+            label: "Madison Area",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffff99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MS",
+            label: "Mid-State",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MI",
+            label: "Milwaukee Area",
+            symbol: {
+              type: "simple-fill",
+              color: "#33a02c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MP",
+            label: "Moraine Park",
+            symbol: {
+              type: "simple-fill",
+              color: "#e31a1c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NI",
+            label: "Nicolet Area",
+            symbol: {
+              type: "simple-fill",
+              color: "#ff7f00",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NC",
+            label: "Northcentral",
+            symbol: {
+              type: "simple-fill",
+              color: "#6a3d9a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NE",
+            label: "Northeast",
+            symbol: {
+              type: "simple-fill",
+              color: "#b15928",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "SW",
+            label: "Southwest",
+            symbol: {
+              type: "simple-fill",
+              color: "#8dd3c7",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "WA",
+            label: "Waukesha County",
+            symbol: {
+              type: "simple-fill",
+              color: "#80b1d3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "WW",
+            label: "Western",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb8072",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NW",
+            label: "Northwood",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdb462",
+              width: "1px",
+              style: "solid"
+            }
+          },]
+        };
         
         var layerTechCollege = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Technical_College_Regions/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 1,
+          opacity: 0.6,
           title: "Tech College",
           visible: false,
           popupTemplate: {
@@ -771,23 +919,13 @@
           },
           minScale: 5000000,
           maxScale: 0,
-          renderer: {
-              type: "simple",  // autocasts as new SimpleRenderer()
-              symbol: {
-                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
-                color: null,
-                outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 1.25,
-                  color: "#00FF00"
-                }
-              }
-            },
+          renderer: techCollegeRenderer,
           labelingInfo: {
               // autocasts as new LabelClass()
               symbol: {
                 type: "text", // autocasts as new TextSymbol()
-                color: "black",
-                haloColor: "#00FF00",
+                color: "white",
+                haloColor: "#6b686b",
                 haloSize: 1,
                 font: {
                   // autocast as new Font()
@@ -856,6 +994,199 @@
                 expression: "$feature.MJJName",
               }
             }
+        });
+          
+        // *****************************************************
+        // add Circuit Court Feature Layer
+        // *****************************************************
+        
+        var layerCircuitCourt = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/CircuitCourt/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1.0,
+          title: "Circuit Court",
+          visible: false,
+          maxScale: 0,
+          minScale: 8000000,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.5,
+                  color: "#A44CD3"
+                }
+              }
+            },
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "#A44CD3",
+                haloColor: "#e0e0e0",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "sans-serif",
+                  size: 8,
+                  weight: "bold",
+                }
+              },
+              maxScale: 0,
+              minScale: 4000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.CC_NAME"
+              },
+            },
+            labelsVisible: true,
+            popupTemplate: {
+                // autocasts as new PopupTemplate()
+                title: "Circuit Court",
+                content: "County: {CC_NAME}",
+                overwriteActions: false
+              }
+        });
+          
+        // *****************************************************
+        // add District Attorney Feature Layer
+        // *****************************************************
+        
+        var layerDistrictAttorney = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/DistrictAttorney/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1.0,
+          title: "District Attorney",
+          visible: false,
+          maxScale: 0,
+          minScale: 8000000,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.5,
+                  color: "#4fc3f7"
+                }
+              }
+            },
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "#4fc3f7",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "sans-serif",
+                  size: 8,
+                  weight: "bold",
+                }
+              },
+              maxScale: 0,
+              minScale: 4000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.DA_Name"
+              },
+            },
+            labelsVisible: true,
+            popupTemplate: {
+                // autocasts as new PopupTemplate()
+                title: "District Attorney",
+                content: "{DA_Name}",
+                overwriteActions: false
+              }
+        });
+          
+        // *****************************************************
+        // add Court of Appeals Feature Layer
+        // *****************************************************
+          
+        const COARenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Court of Appeals"
+          },
+          field: "COA_Dist",
+          uniqueValueInfos: [{
+            value: "Court of Appeals District 1",
+            label: "District 1",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              style: "solid"
+            }
+          }, {
+            value: "Court of Appeals District 2",
+            label: "District 2",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "Court of Appeals District 3",
+            label: "District 3",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              style: "solid"
+            }
+          }, {
+            value: "Court of Appeals District 4",
+            label: "District 4",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          },]
+        };
+          
+        var layerCourtAppeals = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/CourtofAppeals/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "Court of Appeals",
+          visible: false,
+          maxScale: 0,
+          minScale: 8000000,
+          renderer: COARenderer,
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "sans-serif",
+                  size: 8,
+                  weight: "bold",
+                }
+              },
+              maxScale: 0,
+              minScale: 4000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.COA_Dist"
+              },
+            },
+            labelsVisible: true,
+            popupTemplate: {
+                // autocasts as new PopupTemplate()
+                title: "Court of Appeals",
+                content: "{COA_Dist}",
+                overwriteActions: false
+              }
         });
           
         // *****************************************************
@@ -1096,7 +1427,7 @@
         // Create the Map
         const map = new Map({
           basemap: lightGrayBasemap,
-          layers: [layerMunis, layerCounties, layerMJJ, layerTechCollege, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerAldermanic, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
+          layers: [layerMunis, layerCounties, layerCourtAppeals, layerDistrictAttorney, layerCircuitCourt, layerMJJ, layerTechCollege, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerAldermanic, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
         });
           
         let editor, features, editExpand;
@@ -1756,7 +2087,7 @@
             }
           });
           //view.ui.add(queryExpand, "top-right");
-          view.ui.add([infoToolbarExpand, editExpand, legendExpand, searchExpand, queryExpand, layerListExpand], "top-right");
+          view.ui.add([infoToolbarExpand, legendExpand, searchExpand, layerListExpand, queryExpand], "top-right");
             
         //});
           
