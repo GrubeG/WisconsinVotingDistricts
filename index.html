@@ -1826,6 +1826,27 @@
           ]
         });
           
+        //turn on layers when searched if they aren't already on  
+        searchWidget.on("select-result", function(event){
+            console.log(event.source.layer)
+            //turn on schools layer if searched
+            if (event.source.layer === layerSchools) {
+              if (layerSchools.visible  === false) {
+                layerSchools.visible = true;  
+              }
+            };
+            if (event.source.layer === layerMunis) {
+              if (layerMunis.visible  === false) {
+                layerMunis.visible = true;  
+              }
+            };
+            if (event.source.layer === layerCounties) {
+              if (layerCounties.visible  === false) {
+                layerCounties.visible = true;  
+              }
+            };
+        });
+          
         //expand widget
           let searchExpand = new Expand({
             expandIconClass: "esri-icon-search",
@@ -2077,7 +2098,7 @@
           queryExpand.watch("expanded", () => {
             if (queryExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Filter view of data layers. Closing the Filter tool will reset to default.";
+              fieldNameText.textContent = "Filter view of data layers. To reset layers, click the Clear Filter button.";
             }
             //clear the filters when user closes the expand widget  
             if (!queryExpand.expanded) {
