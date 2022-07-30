@@ -1500,11 +1500,6 @@
 
               const item = event.item;
 
-              //if (item.title === "Counties") {
-                // An array of objects defining actions to place in the LayerList.
-                // By making this array two-dimensional, you can separate similar
-                // actions into separate groups with a breaking line.
-
                 item.actionsSections = [
                   [
                     {
@@ -1703,22 +1698,6 @@
         // *****************************************************
         
           
-//        // Typical usage
-//        var vtlLayer = new VectorTileLayer({
-//          // URL to the style of vector tiles
-//          url: "https://uw-mad.maps.arcgis.com/sharing/rest/content/items/b941c095c56c44b98c699550038bc1f0/resources/styles/root.json"
-//          
-//        });
-//
-//        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
-//        //the image in the BasemapToggle widget.
-//        var vtlBasemap = new Basemap({
-//          baseLayers: [vtlLayer],
-//          title: "Light Gray",
-//          //id: "terrain",
-//          //thumbnailUrl: "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
-//        });  
-          
         var basemapGallery = new BasemapGallery({
             view: view,
             source: [lightGrayBasemap, topoBasemap, Basemap.fromId("arcgis-imagery"), Basemap.fromId("arcgis-imagery-standard")] // autocasts to LocalBasemapsSource
@@ -1893,6 +1872,7 @@
           
           
           let layerMunisView = null;
+          let layerCountiesView = null;
           let layerWardsView = null;
           let highlight = null;
           let query = null;
@@ -1922,47 +1902,99 @@
               graphics = null;
               layerWardsView.filter = null;
               layerMunisView.filter = null;
+              layerCountiesView.filter = null;
               queryLayers = null;
               //layerView = null;      
           }
           
+//        // get the selected spatialRelationship
+//            let layerFilter = "layerMunisViewFilter";
+//            document
+//              .getElementById("relationship-select")
+//              .addEventListener("change", (event) => {
+//                const select = event.target;
+//                spatialFilter = select.options[select.selectedIndex].value;
+//                updateFilter();
+//              });
+//          
+        // select the layer to filter on
+        let layerMunisViewFilterSelected = true;
+        document
+          .getElementById("layerMunisViewFilter")
+          .addEventListener("change", (event) => {
+            layerMunisViewFilterSelected = !!event.target.checked;
+            updateFilter();
+          });
+          
+        let layerCountiesViewFilterSelected = true;
+        document
+          .getElementById("layerCountiesViewFilter")
+          .addEventListener("change", (event) => {
+            layerCountiesViewFilterSelected = !!event.target.checked;
+            updateFilter();
+          });
+          
+          
+          
           // set the geometry filter on the visible FeatureLayerView
         function updateFilter() {
           const featureFilter = {
-            spatialRelationship: selectedFilter
+            spatialRelationship: spatialFilter
           };
 
-          if (layerWardsView) {
-            if (layerWardsView.FilterSelected) {
-              layerWardsView.filter = featureFilter;
+          //select the layer to filter by
+          if (layerMunisView) {
+            if (layerMunisViewFilterSelected) {
+              layerMunisView.filter = featureFilter;
             } else {
-              layerWardsView.filter = null;
+              layerMunisView.filter = null;
             }
           }
+          if (layerCountiesView) {
+            if (layerCountiesViewFilterSelected) {
+              layerCountiesView.filter = featureFilter;
+            } else {
+              layerCountiesView.filter = null;
+            }
+          }  
+            
         }
           
           // get the selected spatialRelationship
-            let selectedFilter = "contains";
+            let spatialFilter = "contains";
             document
               .getElementById("relationship-select")
               .addEventListener("change", (event) => {
                 const select = event.target;
-                selectedFilter = select.options[select.selectedIndex].value;
+                spatialFilter = select.options[select.selectedIndex].value;
                 updateFilter();
               });
 //        
           function queryLayers (Map, FeatureLayer, MapView) {
-          
-          view.whenLayerView(layerMunis).then(function(layerView) {
-             layerMunisView = layerView;
-          });
+            console.log(layerMunisViewFilterSelected)
+              
+              if (layerMunisViewFilterSelected) {
+                  
+                  //Pick either Municipality or County
+                  view.whenLayerView(layerMunis).then(function(layerView) {
+                     layerSelectedView = layerView;
+                  });      
+              }
+              
+
+              if (layerCountiesViewFilterSelected) {
+                  
+                  //Pick either Municipality or County
+                  view.whenLayerView(layerCounties).then(function(layerView) {
+                     layerSelectedView = layerView;
+                  });      
+              }
+              
 
           view.whenLayerView(layerWards).then(function(layerView) {
              layerWardsView = layerView;
           });
               
-          
-
 
           var handler = view.on("click", (event) => {
             const query = {
@@ -1970,17 +2002,18 @@
               returnGeometry: true,
               //spatialRelationship: "intersects",
             };
-            layerMunisView.queryFeatures(query).then((results) => {
+              
+            layerSelectedView.queryFeatures(query).then((results) => {
               if (results.features.length > 0) {
                 if (highlight) {
                   highlight.remove();
                 }
                 // highlight query results
-                highlight = layerMunisView.highlight(results.features);
+                highlight = layerSelectedView.highlight(results.features);
 
                 layerWardsView.filter = {
                   geometry: results.features[0].geometry,
-                  spatialRelationship: selectedFilter,
+                  spatialRelationship: spatialFilter,
                   distance: 2 * view.resolution
                 };
                 
@@ -2158,15 +2191,22 @@
     </div>
 -->
     <div id="queryDiv" class="esri-widget">
-          <b>Filter by Municipality</b><br />
-<!--
+          <b>Filter by Municipality or County</b><br />
             <br />
-          Select the layers to filter on:<br />
-          <input id="layerWardsViewFilter" type="checkbox" checked />
-          Buildings<br />
-          <input id="featureLayerViewFilter" type="checkbox" checked /> Trees<br />
+        
+<!--
+          <label for="filter-layer-select">Select spatial relationship:</label>
+          <select id="filter-layer-select" class="options">
+            <option value="layerMunisViewFilter">Municipality</option>
+            <option value="layerCountiesViewFilter">County</option>
+            </select>
 -->
-          <br />Click arrow button below, then click on a municipality to show layers only for that location:
+          Select the layers to filter on:<br />
+          <input id="layerMunisViewFilter" type="checkbox" checked />
+          Municipality<br />
+          <input id="layerCountiesViewFilter" type="checkbox" checked /> County<br />
+        
+          <br />Click arrow button below, then click on a municipality/county to show layers only for that location:
           <div class="geometry-options">
             <button
               class="esri-widget--button esri-icon-navigation geometry-button"
@@ -2174,16 +2214,15 @@
               value="point"
               title="Select Municipality"
             ></button>
-            
-            
+              
           </div>
           <br />
           <label for="relationship-select">Select spatial relationship:</label>
           <select id="relationship-select" class="options">
             <option value="contains">contains</option>
             <option value="intersects">intersects</option>
-            </select
-          ><br /><br />
+            </select>
+        <br /><br />
           
           <button class="esri-button" id="clearFilter" type="button">
             Clear filter
