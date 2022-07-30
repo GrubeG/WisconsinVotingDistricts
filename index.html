@@ -695,7 +695,7 @@
                 }
               },
               maxScale: 0,
-              minScale: 300000,
+              minScale: 600000,
               labelsVisible: true,
               //deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
@@ -749,7 +749,7 @@
                 }
               },
               maxScale: 0,
-              minScale: 150000,
+              minScale: 300000,
               labelsVisible: true,
               deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
@@ -1901,8 +1901,8 @@
               highlight.remove();
               graphics = null;
               layerWardsView.filter = null;
-              layerMunisView.filter = null;
-              layerCountiesView.filter = null;
+              //layerMunisView.filter = null;
+              //layerCountiesView.filter = null;
               queryLayers = null;
               //layerView = null;      
           }
@@ -1923,14 +1923,17 @@
           .getElementById("layerMunisViewFilter")
           .addEventListener("change", (event) => {
             layerMunisViewFilterSelected = !!event.target.checked;
+            layerCountiesViewFilterSelected = false;
             updateFilter();
           });
           
-        let layerCountiesViewFilterSelected = true;
+        let layerCountiesViewFilterSelected = false;
         document
           .getElementById("layerCountiesViewFilter")
           .addEventListener("change", (event) => {
             layerCountiesViewFilterSelected = !!event.target.checked;
+            layerMunisViewFilterSelected = false;
+            
             updateFilter();
           });
           
@@ -1946,6 +1949,9 @@
           if (layerMunisView) {
             if (layerMunisViewFilterSelected) {
               layerMunisView.filter = featureFilter;
+              
+            
+              
             } else {
               layerMunisView.filter = null;
             }
@@ -1953,6 +1959,8 @@
           if (layerCountiesView) {
             if (layerCountiesViewFilterSelected) {
               layerCountiesView.filter = featureFilter;
+              
+              
             } else {
               layerCountiesView.filter = null;
             }
@@ -1972,6 +1980,7 @@
 //        
           function queryLayers (Map, FeatureLayer, MapView) {
             console.log(layerMunisViewFilterSelected)
+            console.log(layerCountiesViewFilterSelected)
               
               if (layerMunisViewFilterSelected) {
                   
@@ -1995,6 +2004,10 @@
              layerWardsView = layerView;
           });
               
+          view.whenLayerView(layerDistrictCombos).then(function(layerView) {
+             layerDistrictCombosView = layerView;
+          });
+              
 
           var handler = view.on("click", (event) => {
             const query = {
@@ -2012,6 +2025,12 @@
                 highlight = layerSelectedView.highlight(results.features);
 
                 layerWardsView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: spatialFilter,
+                  distance: 2 * view.resolution
+                };
+                  
+                layerDistrictCombosView.filter = {
                   geometry: results.features[0].geometry,
                   spatialRelationship: spatialFilter,
                   distance: 2 * view.resolution
@@ -2202,9 +2221,9 @@
             </select>
 -->
           Select the layers to filter on:<br />
-          <input id="layerMunisViewFilter" type="checkbox" checked />
+          <input id="layerMunisViewFilter" input name="layerSwitcher" type="radio" value="1" checked />
           Municipality<br />
-          <input id="layerCountiesViewFilter" type="checkbox" checked /> County<br />
+          <input id="layerCountiesViewFilter" input name="layerSwitcher" type="radio" value="2" /> County<br />
         
           <br />Click arrow button below, then click on a municipality/county to show layers only for that location:
           <div class="geometry-options">
