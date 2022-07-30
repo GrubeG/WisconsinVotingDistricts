@@ -1901,8 +1901,10 @@
               highlight.remove();
               graphics = null;
               layerWardsView.filter = null;
-              //layerMunisView.filter = null;
-              //layerCountiesView.filter = null;
+              layerDistrictCombosView.filter = null;
+              layerAldermanicView.filter = null;
+              layerCountySupView.filter = null;
+              
               queryLayers = null;
               //layerView = null;      
           }
@@ -1960,7 +1962,6 @@
             if (layerCountiesViewFilterSelected) {
               layerCountiesView.filter = featureFilter;
               
-              
             } else {
               layerCountiesView.filter = null;
             }
@@ -2008,6 +2009,14 @@
              layerDistrictCombosView = layerView;
           });
               
+          view.whenLayerView(layerAldermanic).then(function(layerView) {
+             layerAldermanicView = layerView;
+          });
+              
+          view.whenLayerView(layerCountySup).then(function(layerView) {
+             layerCountySupView = layerView;
+          });
+              
 
           var handler = view.on("click", (event) => {
             const query = {
@@ -2031,6 +2040,18 @@
                 };
                   
                 layerDistrictCombosView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: spatialFilter,
+                  distance: 2 * view.resolution
+                };
+                  
+                layerAldermanicView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: spatialFilter,
+                  distance: 2 * view.resolution
+                };
+                  
+                layerCountySupView.filter = {
                   geometry: results.features[0].geometry,
                   spatialRelationship: spatialFilter,
                   distance: 2 * view.resolution
