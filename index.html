@@ -1900,13 +1900,13 @@
              
               highlight.remove();
               graphics = null;
+              queryLayers = null;
+              
               layerWardsView.filter = null;
               layerDistrictCombosView.filter = null;
               layerAldermanicView.filter = null;
               layerCountySupView.filter = null;
-              
-              queryLayers = null;
-              //layerView = null;      
+                
           }
           
 //        // get the selected spatialRelationship
@@ -2054,7 +2054,7 @@
                 layerCountySupView.filter = {
                   geometry: results.features[0].geometry,
                   spatialRelationship: spatialFilter,
-                  distance: 2 * view.resolution
+                  distance: 4 * view.resolution
                 };
                 
                 
@@ -2234,19 +2234,12 @@
           <b>Filter by Municipality or County</b><br />
             <br />
         
-<!--
-          <label for="filter-layer-select">Select spatial relationship:</label>
-          <select id="filter-layer-select" class="options">
-            <option value="layerMunisViewFilter">Municipality</option>
-            <option value="layerCountiesViewFilter">County</option>
-            </select>
--->
-          Select the layers to filter on:<br />
+          Select the jurisdiction type:<br />
           <input id="layerMunisViewFilter" input name="layerSwitcher" type="radio" value="1" checked />
           Municipality<br />
           <input id="layerCountiesViewFilter" input name="layerSwitcher" type="radio" value="2" /> County<br />
         
-          <br />Click arrow button below, then click on a municipality/county to show layers only for that location:
+          <br />Click arrow button below, then click on a municipality or county to show districts only for that location:
           <div class="geometry-options">
             <button
               class="esri-widget--button esri-icon-navigation geometry-button"
