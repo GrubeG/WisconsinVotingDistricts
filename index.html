@@ -1305,7 +1305,7 @@
         var layerMJJ = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_MultiJurisdictionalJudge/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 1,
+          opacity: 0.6,
           title: "Multi-Jurisdiction Judge",
           visible: false,
           popupTemplate: {
@@ -1320,10 +1320,10 @@
               type: "simple",  // autocasts as new SimpleRenderer()
               symbol: {
                 type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
-                color: null,
+                color: "#D2B48C",
                 outline: {  // autocasts as new SimpleLineSymbol()
                   width: 1.25,
-                  color: "#D2B48C"
+                  color: "brown"
                 }
               }
             },
@@ -1773,7 +1773,31 @@
           title: "Topographic",
           //id: "terrain",
           thumbnailUrl: "img/Topo_NoLabels.png",
-        }); 
+        });
+          
+//        // Aerial Photo from Mapbox
+//        var aerialLayer = new WebTileLayer({
+//          // URL to the style of vector tiles
+//          urlTemplate: "https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{level}/{col}/{row}"
+//        });
+
+        // Aerial Photo from Mapbox
+        var aerialLayer = new WebTileLayer({
+          // URL to the style of raster tiles
+          urlTemplate: "https://api.mapbox.com/styles/v1/tripleg373/cl6cwnikf003c14qnfhcy13z1/tiles/256/{level}/{col}/{row}@2x?access_token=pk.eyJ1IjoidHJpcGxlZzM3MyIsImEiOiJjanprazZ0cHMwbHMyM29vYXk5ZGlnNGNvIn0.UYb-wxnQA4qlVCD8Ayg6ow",
+          copyright: "© OpenStreetMap contributors Design © Mapbox"
+        });
+          
+        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
+        //the image in the BasemapToggle widget.
+        var aerialBasemap = new Basemap({
+          baseLayers: [aerialLayer],
+          title: "Imagery with Labels",
+          //id: "terrain",
+          thumbnailUrl: "img/MapboxAerial.png",
+        });
+          
+        
         
         // *****************************************************
         // Define the Map Display
@@ -2058,7 +2082,7 @@
           
         var basemapGallery = new BasemapGallery({
             view: view,
-            source: [lightGrayBasemap, topoBasemap, Basemap.fromId("arcgis-imagery"), Basemap.fromId("arcgis-imagery-standard")] // autocasts to LocalBasemapsSource
+            source: [lightGrayBasemap, topoBasemap, aerialBasemap, Basemap.fromId("arcgis-imagery"), Basemap.fromId("arcgis-imagery-standard")] // autocasts to LocalBasemapsSource
         });
           
         let basemapExpand = new Expand({
