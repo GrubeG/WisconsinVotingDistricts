@@ -97,6 +97,7 @@
         bottom: 15px;
         right: 10px;
         font-size: 14px;
+        text-align: center;
       }
         
 
@@ -112,9 +113,10 @@
         border-image: none;
       }
 
-      .geometry-button-selected {
-        background: #4c4c4c;
+      .geometry-button:focus {
+        background: gray;
         color: #fff;
+        border-width: 2px;
       }
         
       .options {
@@ -219,7 +221,7 @@
           popupTemplate: {
             // autocasts as new PopupTemplate()
             title: "Congressional District: {CON2021}",
-            content: "Active as March, 2022",
+            content: "Adopted March 3, 2022",
             overwriteActions: false
           },
           labelingInfo: {
@@ -259,7 +261,7 @@
           popupTemplate: {
             // autocasts as new PopupTemplate()
             title: "Senate District: {SEN2021}",
-            content: "Active as April 16, 2022",
+            content: "Adopted April 16, 2022",
             overwriteActions: false
           },
           labelingInfo: {
@@ -299,7 +301,7 @@
           popupTemplate: {
             // autocasts as new PopupTemplate()
             title: "Assembly District: {ASM2021}",
-            content: "Active as April 16, 2022",
+            content: "Adopted April 16, 2022",
             overwriteActions: false
           },
           labelingInfo: {
@@ -690,6 +692,7 @@
             content: "County: {CNTY_NAME} </br> Supervisory District: {SUPERID}",
             overwriteActions: false
           },
+          minScale: 1200000,
           labelingInfo: {
               // autocasts as new LabelClass()
               symbol: {
@@ -705,7 +708,7 @@
                 }
               },
               maxScale: 0,
-              minScale: 600000,
+              minScale: 1200000,
               labelsVisible: true,
               deconflictionStrategy: "dynamicNeverRemove",
               labelExpressionInfo: {
@@ -1678,12 +1681,10 @@
               },
             },
             labelsVisible: true,
-//          popupTemplate: {
-//            // autocasts as new PopupTemplate()
-//            title: "Municipality",
-//            content: "{MuniName} </br> County: {CNTY_NAME}",
-//            overwriteActions: false
-//          }
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "{Label}",
+          }
         });
           
         // *****************************************************
@@ -1732,14 +1733,12 @@
             labelsVisible: true,
 //          popupTemplate: {
 //            // autocasts as new PopupTemplate()
-//            title: "County",
-//            content: "County: {CNTY_NAME} </br> Ward: {LABEL} </br> School: {SDNM} </br> {SanName}",
-//            overwriteActions: false
+//            title: "{CNTY_NAME} County",
 //          }
         });
         
         // *****************************************************
-        // add Custom Basemap from Vector Tile Layer
+        // add Custom Basemap from Vector Tile Layer and Web Tile Layer
         // *****************************************************
           
         // Light Gray
@@ -2272,11 +2271,10 @@
           // click event handler for query choices
           turnOnQueryElement.addEventListener("click", queryLayers, true);
           
+          
           //remove the event listener
           removeQueryElement.addEventListener("click", clearFilter, true);
             
-          
-          
           
           function clearFilter() {
              
@@ -2290,17 +2288,7 @@
               layerCountySupView.filter = null;
                 
           }
-          
-//        // get the selected spatialRelationship
-//            let layerFilter = "layerMunisViewFilter";
-//            document
-//              .getElementById("relationship-select")
-//              .addEventListener("change", (event) => {
-//                const select = event.target;
-//                spatialFilter = select.options[select.selectedIndex].value;
-//                updateFilter();
-//              });
-//          
+      
         // select the layer to filter on
         let layerMunisViewFilterSelected = true;
         document
@@ -2446,113 +2434,7 @@
              handler.remove();
               
           });
-
-//          function drawPoint() {
-//            if (highlight) {
-//              highlight.remove();
-//            }
-//            const action = draw.create("point");
-//
-//            // Give a visual feedback to users as they move the pointer over the view
-//            action.on("cursor-update", function (evt) {
-//              view.graphics.removeAll();
-//              drawPnt = new Point({
-//                x: evt.coordinates[0],
-//                y: evt.coordinates[1],
-//                spatialReference: view.spatialReference
-//              });
-//              graphic = new Graphic({
-//                geometry: drawPnt,
-//                symbol: sym
-//              });
-//              view.graphics.add(graphic);
-//              if(ctrlKey && !evt.native.ctrlKey){
-//                draw.reset();
-//                view.graphics.removeAll();
-//                selectMunis();
-//              }
-//            });
-//
-//            action.on("draw-complete", function (evt) {
-//              if (evt.native.ctrlKey) {
-//                ctrlKey = true;
-//              }else{
-//                ctrlKey = false;
-//              }
-//              drawPnt = new Point({
-//                x: evt.coordinates[0],
-//                y: evt.coordinates[1],
-//                spatialReference: view.spatialReference
-//              });
-//
-//              graphic = new Graphic({
-//                geometry: drawPnt,
-//                symbol: sym
-//              });
-//              pntGraphics.add(graphic);
-//              if (evt.native.ctrlKey) {
-//                drawPoint();
-//              } else {
-//                view.graphics.removeAll();
-//                selectMunis();
-//              }
-//            });
-//            view.focus();
-//          };
-//
-//          function selectMunis(){
-//            let mp = new Multipoint({
-//              spatialReference: view.spatialReference
-//            });
-//            let pntArray = pntGraphics.graphics.map(function(gra){
-//              mp.addPoint(gra.geometry);
-//            });
-//
-//            const query = {
-//              geometry: mp,
-//              outFields: ["*"],
-//              outSpatialReference: view.spatialReference,
-//              returnGeometry: true
-//            };
-//            // let query = layerMunis.createQuery();
-//            // query.geometry = mp;
-//            // query.outSpatialReference = view.spatialReference;
-//            // query.returnGeometry = true;
-//            layerMunis.queryFeatures(query)
-//            .then(function(results){
-//              const graphics = results.features;
-//              // remove existing highlighted features
-//              if (highlight) {
-//                highlight.remove();
-//              }
-//
-//              // highlight query results
-//              highlight = layerMunisView.highlight(graphics);
-//              pntGraphics.removeAll();
-//            }).catch(function(err){
-//              console.error(err);
-//            })
-//          }
       };
-          
-      
-          
-//        // set an attribute filter on filter layer view
-//        // to display the warnings issued in that poi
-//        function filterBypoi(event) {
-//          const selectedpoi = event.target.getAttribute("data-poi");
-//          layerMunisView.filter = {
-//            where: "POITYPE = '" + selectedpoi + "'"
-//          };
-//        }
-
-        //view.whenLayerView(layerMunis).then((layerView) => {
-          // flash filter warnings layer loaded
-          // get a reference to the filter warnings layerview
-          //layerMunisView = layerView;
-
-          // set up UI items
-          //queryElement.style.visibility = "visible";
         
           let queryExpand = new Expand({
             view: view,
@@ -2621,7 +2503,10 @@
           Municipality<br />
           <input id="layerCountiesViewFilter" input name="layerSwitcher" type="radio" value="2" /> County<br />
         
-          <br />Click arrow button below, then click on a municipality or county to show districts only for that location:
+          <br />Click arrow button below, then click municipality or county on the map to show districts only for that location.
+          <h1 style="font-size:10px">*Usable with Wards, District Combos, Aldermanic and County Supervisor*</h1>
+          
+          
           <div class="geometry-options">
             <button
               class="esri-widget--button esri-icon-navigation geometry-button"
@@ -2632,6 +2517,8 @@
               
           </div>
           <br />
+          
+          
           <label for="relationship-select">Select spatial relationship:</label>
           <select id="relationship-select" class="options">
             <option value="contains">contains</option>

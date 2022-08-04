@@ -6,12 +6,12 @@
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
     <title>
-      Sequoia and Kings Canyon Tree Locator
+      Wisconsin Voting Districts
     </title>
 
     <link
       rel="stylesheet"
-      href="https://js.arcgis.com/4.23/esri/themes/dark/main.css"
+      href="https://js.arcgis.com/4.23/esri/themes/light/main.css"
     />
     <script src="https://js.arcgis.com/4.23/"></script>
 
@@ -24,7 +24,7 @@
         margin: 0;
         height: 100%;
         width: 100%;
-      }
+      } 
 
       #info {
         height: 100%;
@@ -42,42 +42,11 @@
         
       }
         
-      #query-type {
-        padding: 8px;
-        border-radius: 5px;
-        width: 120px;
-      }
-        
-     #pois-filter {
-        height: 120px;
-        width: 100%;
-        visibility: hidden;
-      }
-
-      .poi-item {
-        width: 125px;
-        padding: 13px;
-        text-align: center;
-        vertical-align: baseline;
-        cursor: pointer;
-        height: 40px;
-        font-size: 13px;
-      }
-
-      .poi-item:focus {
-        background-color: dimgrey;
-      }
-
-      .poi-item:hover {
-        background-color: dimgrey;
-      }
-        
       div.image::before {
-        content:url("img/SEKI_logo.PNG");
+        content:url("img/WEC_Logo.png");
       }
       
-        
-    .esri-editor .esri-item-list__scroller {
+     .esri-layer-list .esri-item-list__scroller {
         max-height: 100%;
         max-width: 250px;
       }
@@ -87,10 +56,81 @@
           min-height: 60%;
           max-width: 250px;
       }
-      .esri-ui .esri-editor .esri-item-list__scroller {
+      .esri-ui .esri-layer-list .esri-item-list__scroller {
           max-height: 100%;
           max-width: 250px;
-      }    
+      }
+    
+      .esri-layer-list__item {
+        background-color: $background-color;
+        border-bottom: 1px solid $border-color;
+        position: relative;
+        overflow: hidden;
+        list-style: none;
+        margin: $cap-spacing--quarter 0;
+        padding: 0;
+        @include sortableChosen("esri-layer-list--chosen");
+      }
+        
+      .esri-layer-list__item-container {
+        border-left: $border-size--active solid transparent;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 4px 4px 4px 4px;
+        transition: border-color 250ms ease-in-out;
+      }
+        
+      .esri-icon-non-visible::before {
+      content: "\e610";
+      }
+      .esri-icon-visible::before {
+      content: "\e611";
+      }
+
+      #queryDiv {
+        background-color: white;
+        padding: 14px;
+        border-radius: 5px;
+        width: 240px;
+        margin: 5px;
+        bottom: 15px;
+        right: 10px;
+        font-size: 14px;
+        text-align: center;
+      }
+        
+
+      .geometry-options {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .geometry-button {
+        flex: 1;
+        border-style: solid;
+        border-width: 1px;
+        border-image: none;
+      }
+
+      .geometry-button:focus {
+        background: gray;
+        color: #fff;
+        border-width: 2px;
+      }
+        
+      .options {
+        max-width: 260px;
+        width: 100%;
+        height: 25px;
+      }
+
+      #bufferNum {
+        width: 90%;
+        margin: 2.5em auto 0;
+      }
+        
+    
         
     </style>
     <script>
@@ -111,10 +151,19 @@
         "esri/Graphic",
         "esri/symbols/SimpleFillSymbol",
         "esri/symbols/SimpleMarkerSymbol",
-        "esri/widgets/BasemapToggle",
+        "esri/widgets/BasemapGallery",
+        "esri/Basemap",
         "esri/widgets/Legend",
         "esri/widgets/FeatureTemplates",
         "esri/config",
+        "esri/widgets/Print",
+        "esri/widgets/Print/TemplateOptions",
+        "esri/widgets/Slider",
+        "esri/layers/WebTileLayer",
+        "esri/layers/VectorTileLayer",
+        "esri/layers/support/FeatureEffect",
+        "esri/rest/support/Query",
+        
         
           
         "dojo/on",
@@ -138,188 +187,1628 @@
         Graphic,
         SimpleFillSymbol,
         SimpleMarkerSymbol,
-        BasemapToggle,
+        BasemapGallery,
+        Basemap,
         Legend,
         FeatureTemplates,
         esriConfig,
+        Print,
+        TemplateOptions,
+        Slider,
+        WebTileLayer,
+        VectorTileLayer,
+        FeatureEffect,
+        Query,
         on, dom, domConstruct
       ) => {
           
         esriConfig.apiKey = "AAPKd7a5f0028e3d432faec9c8e03740f0d8ntcrv-SGuCaGKZrLrQxv4azO6TaiERQO5QwoBDUznyrB6hxLK2EZe7oCwvq7bldk";
           
-        // add the park outline featurelayer
-        var layerBoundary = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_boundary/FeatureServer/0",
+        // *****************************************************
+        // Define Feature Layers to be added to the map
+        // *****************************************************
+        
+        // *****************************************************
+        // add Congressional Feature Layer
+        // *****************************************************  
+    
+        var layerCongressional = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_CongressionalDistricts/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.3,
-          title: "Park Boundaries",
-          visible: true
+          opacity: 0.6,
+          title: "Congressional",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Congressional District: {CON2021}",
+            content: "Adopted March 3, 2022",
+            overwriteActions: false
+          },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Arial",
+                  size: 12,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.CON2021"
+              }
+            }
         });
+          
+        // *****************************************************
+        // add Senate Feature Layer
+        // *****************************************************
           
         // add the park groves featurelayer
-        var layerGroves = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/CA_SEGI_groves/FeatureServer/0",
+        var layerSenate = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Senate_Districts/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.5,
-          title: "Sequoia Groves",
-          visible: true,
-//          labelingInfo: {
-//            // autocasts as new PopupTemplate()
-//            title: "{Grove_Name}",
-            overwriteActions: true
-//          }
+          opacity: 0.6,
+          title: "State Senate",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Senate District: {SEN2021}",
+            content: "Adopted April 16, 2022",
+            overwriteActions: false
+          },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Arial",
+                  size: 10,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.SEN2021"
+              }
+            }
         });
+          
+        // *****************************************************
+        // add Assembly Feature Layer
+        // *****************************************************
         
         // add the park roads featurelayer
-        var layerRoads = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_roads/FeatureServer/0",
+        var layerAssembly = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Assembly_Districts/FeatureServer/0",
           //outFields: ["*"],
-          opacity: 0.8,
-          title: "Park Roads",
-          visible: true,
+          opacity: 0.6,
+          title: "State Assembly",
+          visible: false,
           popupTemplate: {
             // autocasts as new PopupTemplate()
-            title: "Road: {RDNAME}",
-            content: "Road Class: {RDCLASS}",
+            title: "Assembly District: {ASM2021}",
+            content: "Adopted April 16, 2022",
             overwriteActions: false
-          }
-        });
-        
-        // add the park trails featurelayer
-        var layerTrails = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_trails/FeatureServer/0",
-          //outFields: ["*"],
-          opacity: 0.8,
-          title: "Park Trails",
-          visible: true,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "Trail: {TRLNAME}",
-            content: "Trail {TRLCLASS}",
-            overwriteActions: false
-          }
+          },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Arial",
+                  size: 10,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.ASM2021"
+              }
+            }
         });
           
-        // View how each marker
-        // symbol is created for Points of Interest
-        const layerPOIRenderer = {
+        // *****************************************************
+        // add County Supervisory Feature Layer
+        // *****************************************************
+        
+        const countySupRenderer = {
           type: "unique-value",
-          field: "POITYPE",
-          uniqueValueInfos: [
-            {
-              value: "Restroom",
+          legendOptions: {
+            title: "Supervisor Number"
+          },
+          field: "SUPERID",
+          uniqueValueInfos: [{
+            value: "01",
+            label: "01",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              width: "0px",
+              style: "solid"
+            }
+          }, {
+            value: "02",
+            label: "02",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "03",
+            label: "03",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "04",
+            label: "04",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          }, {
+            value: "05",
+            label: "05",
+            symbol: {
+              type: "simple-fill",
+              color: "#cab2d6",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "06",
+            label: "06",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffff99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "07",
+            label: "07",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "08",
+            label: "08",
+            symbol: {
+              type: "simple-fill",
+              color: "#33a02c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "09",
+            label: "09",
+            symbol: {
+              type: "simple-fill",
+              color: "#e31a1c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "10",
+            label: "10",
+            symbol: {
+              type: "simple-fill",
+              color: "#ff7f00",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "11",
+            label: "11",
+            symbol: {
+              type: "simple-fill",
+              color: "#6a3d9a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "12",
+            label: "12",
+            symbol: {
+              type: "simple-fill",
+              color: "#b15928",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "13",
+            label: "13",
+            symbol: {
+              type: "simple-fill",
+              color: "#8dd3c7",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "14",
+            label: "14",
+            symbol: {
+              type: "simple-fill",
+              color: "#80b1d3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "15",
+            label: "15",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb8072",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "16",
+            label: "16",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdb462",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "17",
+            label: "17",
+            symbol: {
+              type: "simple-fill",
+              color: "#bebada",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "18",
+            label: "18",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffed6f",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "19",
+            label: "19",
+            symbol: {
+              type: "simple-fill",
+              color: "#b3de69",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "20",
+            label: "20",
+            symbol: {
+              type: "simple-fill",
+              color: "#fccde5",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "21",
+            label: "21",
+            symbol: {
+              type: "simple-fill",
+              color: "#d92b30",
+              style: "solid"
+            }
+          }, {
+            value: "22",
+            label: "22",
+            symbol: {
+              type: "simple-fill",
+              color: "#0095ba",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "23",
+            label: "23",
+            symbol: {
+              type: "simple-fill",
+              color: "#3cccb4",
+              style: "solid"
+            }
+          }, {
+            value: "24",
+            label: "24",
+            symbol: {
+              type: "simple-fill",
+              color: "#ab52b3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "25",
+            label: "25",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffb259",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "26",
+            label: "26",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffdf3c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "27",
+            label: "27",
+            symbol: {
+              type: "simple-fill",
+              color: "#eb82eb",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "28",
+            label: "28",
+            symbol: {
+              type: "simple-fill",
+              color: "#c27c30",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "29",
+            label: "29",
+            symbol: {
+              type: "simple-fill",
+              color: "#a0d17d",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "30",
+            label: "30",
+            symbol: {
+              type: "simple-fill",
+              color: "#f260a1",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "31",
+            label: "31",
+            symbol: {
+              type: "simple-fill",
+              color: "#7db3ab",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "32",
+            label: "32",
+            symbol: {
+              type: "simple-fill",
+              color: "#dbe6d1",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "33",
+            label: "33",
+            symbol: {
+              type: "simple-fill",
+              color: "#d6a394",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "34",
+            label: "34",
+            symbol: {
+              type: "simple-fill",
+              color: "#c8e0e3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "35",
+            label: "35",
+            symbol: {
+              type: "simple-fill",
+              color: "#b5d6f2",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "36",
+            label: "36",
+            symbol: {
+              type: "simple-fill",
+              color: "#f2f1c2",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "37",
+            label: "37",
+            symbol: {
+              type: "simple-fill",
+              color: "#bf7872",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "38",
+            label: "38",
+            symbol: {
+              type: "simple-fill",
+              color: "#e3a3dd",
+              width: "1px",
+              style: "solid"
+            }
+          },]
+        };
+          
+        // add the park fire history featurelayer
+        var layerCountySup = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_CountySup_Districts/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "County Supervisor",
+          visible: false,
+          renderer: countySupRenderer,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "County Supervisor",
+            content: "County: {CNTY_NAME} </br> Supervisory District: {SUPERID}",
+            overwriteActions: false
+          },
+          minScale: 1200000,
+          labelingInfo: {
+              // autocasts as new LabelClass()
               symbol: {
-                type: "picture-marker",
-                url: "img/restrooms-black-22.svg",
-                contentType: "image/svg",  
-              }   
-            },
-            {
-              value: "Trailhead",
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 10,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 1200000,
+              labelsVisible: true,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.SUPERID"
+              }
+            }
+        });
+        
+        // *****************************************************
+        // add Aldermanic Feature Layer
+        // *****************************************************
+        
+        const alderRenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Aldermanic Number"
+          },
+          field: "ALDERID",
+          uniqueValueInfos: [{
+            value: "01",
+            label: "01",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              width: "0px",
+              style: "solid"
+            }
+          }, {
+            value: "02",
+            label: "02",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "03",
+            label: "03",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "04",
+            label: "04",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          }, {
+            value: "05",
+            label: "05",
+            symbol: {
+              type: "simple-fill",
+              color: "#cab2d6",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "06",
+            label: "06",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffff99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "07",
+            label: "07",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "08",
+            label: "08",
+            symbol: {
+              type: "simple-fill",
+              color: "#33a02c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "09",
+            label: "09",
+            symbol: {
+              type: "simple-fill",
+              color: "#e31a1c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "10",
+            label: "10",
+            symbol: {
+              type: "simple-fill",
+              color: "#ff7f00",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "11",
+            label: "11",
+            symbol: {
+              type: "simple-fill",
+              color: "#6a3d9a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "12",
+            label: "12",
+            symbol: {
+              type: "simple-fill",
+              color: "#b15928",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "13",
+            label: "13",
+            symbol: {
+              type: "simple-fill",
+              color: "#8dd3c7",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "14",
+            label: "14",
+            symbol: {
+              type: "simple-fill",
+              color: "#80b1d3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "15",
+            label: "15",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb8072",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "16",
+            label: "16",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdb462",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "17",
+            label: "17",
+            symbol: {
+              type: "simple-fill",
+              color: "#bebada",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "18",
+            label: "18",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffed6f",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "19",
+            label: "19",
+            symbol: {
+              type: "simple-fill",
+              color: "#b3de69",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "20",
+            label: "20",
+            symbol: {
+              type: "simple-fill",
+              color: "#fccde5",
+              width: "1px",
+              style: "solid"
+            }
+          },]
+        };
+          
+        // add the park fire history featurelayer
+        var layerAldermanic = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Aldermanic_Districts/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.5,
+          title: "Aldermanic",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Aldermanic",
+            content: "Municipality: {Label} </br> Aldermanic District: {ALDERID}",
+            overwriteActions: false
+          },
+          minScale: 600000,
+          maxScale: 0,
+          renderer: alderRenderer,    
+          labelingInfo: {
+              // autocasts as new LabelClass()
               symbol: {
-                type: "picture-marker",
-                url: "img/trailhead-black-22.svg",
-                contentType: "image/svg",
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "black",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 10,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              labelsVisible: true,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.ALDERID"
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add Sanitary Districts Feature Layer
+        // *****************************************************
+          
+        // add the sanitary featurelayer
+        var layerSanitary = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SanitaryDistricts/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1,
+          title: "Elected Sanitary",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Sanitary District",
+            content: "District Name: {SanName} </br> Code: {SanCode}",
+            overwriteActions: false,
+          },
+          minScale: 600000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 2,
+                  color: "#ffaf42"
+                }
               }
             },
-            {
-              value: "Ranger Station",
+          labelingInfo: {
+              // autocasts as new LabelClass()
               symbol: {
-                type: "picture-marker",
-                url: "img/ranger-station-black-22.svg",
-                contentType: "image/svg",
+                type: "text", // autocasts as new TextSymbol()
+                color: "#333333",
+                haloColor: "#ffaf42",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.SanName"
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add Wards Feature Layer
+        // *****************************************************
+          
+        // add the wards featurelayer
+        var layerWards = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Wards/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1,
+          title: "Wards",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Wards",
+            content: "County: {CNTY_NAME} </br> Ward: {LABEL}",
+            overwriteActions: false
+          },
+          minScale: 600000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.5,
+                  color: "blue"
+                }
               }
             },
-            {
-              value: "Campground",
+          labelingInfo: {
+              // autocasts as new LabelClass()
               symbol: {
-                type: "picture-marker",
-                url: "img/campground-black-22.svg",
-                contentType: "image/svg",
+                type: "text", // autocasts as new TextSymbol()
+                color: "blue",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 600000,
+              labelsVisible: true,
+              //deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.WardLbl"
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add District Combos Feature Layer
+        // *****************************************************
+        
+        
+        var layerDistrictCombos = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_DistrictCombos/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1,
+          title: "District Combos",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "District Combo",
+            content: "County: {CNTY_NAME} </br> Ward: {LABEL} </br> School: {SDNM} </br> {SanName}",
+            overwriteActions: false
+          },
+          minScale: 300000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.25,
+                  color: "red"
+                }
               }
             },
-            {
-              value: "Telephone",
+          labelingInfo: {
+              // autocasts as new LabelClass()
               symbol: {
-                type: "picture-marker",
-                url: "img/telephone-black-22.svg",
-                contentType: "image/svg",
+                type: "text", // autocasts as new TextSymbol()
+                color: "red",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              labelsVisible: true,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.LblWard + TextFormatting.NewLine + $feature.SDNM + $feature.LblSD + TextFormatting.NewLine + $feature.LblSan"
               }
-            },
-            {
-              value: "Picnic Area",
-              symbol: {
-                type: "picture-marker",
-                url: "img/picnic-area-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Store",
-              symbol: {
-                type: "picture-marker",
-                url: "img/snack-bar-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Lodge",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sleeping-shelter-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Entrance Station",
-              symbol: {
-                type: "picture-marker",
-                url: "img/entrance-station-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Visitor Center",
-              symbol: {
-                type: "picture-marker",
-                url: "img/visitor-center-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-          ]
+            }
+        });
+          
+        // *****************************************************
+        // add Technicial Colleges Feature Layer
+        // *****************************************************
+        
+        const techCollegeRenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Tech College"
+          },
+          field: "WTCR_ABV",
+          uniqueValueInfos: [{
+            value: "BH",
+            label: "Blackhawk",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              style: "solid"
+            }
+          }, {
+            value: "CV",
+            label: "Chippewa Valley",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "FV",
+            label: "Fox Valley",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              style: "solid"
+            }
+          }, {
+            value: "GW",
+            label: "Gateway",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          }, {
+            value: "LS",
+            label: "Lakeshore",
+            symbol: {
+              type: "simple-fill",
+              color: "#cab2d6",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MA",
+            label: "Madison Area",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffff99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MS",
+            label: "Mid-State",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MI",
+            label: "Milwaukee Area",
+            symbol: {
+              type: "simple-fill",
+              color: "#33a02c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MP",
+            label: "Moraine Park",
+            symbol: {
+              type: "simple-fill",
+              color: "#e31a1c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NI",
+            label: "Nicolet Area",
+            symbol: {
+              type: "simple-fill",
+              color: "#ff7f00",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NC",
+            label: "Northcentral",
+            symbol: {
+              type: "simple-fill",
+              color: "#6a3d9a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NE",
+            label: "Northeast",
+            symbol: {
+              type: "simple-fill",
+              color: "#b15928",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "SW",
+            label: "Southwest",
+            symbol: {
+              type: "simple-fill",
+              color: "#8dd3c7",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "WA",
+            label: "Waukesha County",
+            symbol: {
+              type: "simple-fill",
+              color: "#80b1d3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "WW",
+            label: "Western",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb8072",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NW",
+            label: "Northwood",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdb462",
+              width: "1px",
+              style: "solid"
+            }
+          },]
         };
         
-        // add the park points of interest featurelayer
-        var layerPOI = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_poi/FeatureServer/0",
-          outFields: ["POITYPE"],
-          title: "Points of Interest",
-          visible: true,
-          renderer: layerPOIRenderer,
+        var layerTechCollege = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Technical_College_Regions/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "Tech College",
+          visible: false,
           popupTemplate: {
             // autocasts as new PopupTemplate()
-            title: "Feature: {POINAME}",
-            content: "Feature Type: {POITYPE}",
+            title: "Technical College Regions",
+            content: "Technical College: {WTC_REGION}",
             overwriteActions: false
+          },
+          minScale: 5000000,
+          maxScale: 0,
+          renderer: techCollegeRenderer,
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "white",
+                haloColor: "#6b686b",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.WTC_REGION"
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add Multi-Jurisdictional Judge Feature Layer
+        // *****************************************************
+        
+        
+        var layerMJJ = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_MultiJurisdictionalJudge/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "Multi-Jurisdiction Judge",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "Multi-Jurisdictional Judge",
+            content: "Name: {MJJNAME} </br> Code: {MJJCode}",
+            overwriteActions: false
+          },
+          minScale: 600000,
+          maxScale: 0,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: "#D2B48C",
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.25,
+                  color: "brown"
+                }
+              }
+            },
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "#D2B48C",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 600000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.MJJName",
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add Circuit Court Feature Layer
+        // *****************************************************
+        
+        var layerCircuitCourt = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/CircuitCourt/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1.0,
+          title: "Circuit Court",
+          visible: false,
+          maxScale: 0,
+          minScale: 5000000,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.5,
+                  color: "#A44CD3"
+                }
+              }
+            },
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "#A44CD3",
+                haloColor: "#e0e0e0",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "sans-serif",
+                  size: 8,
+                  weight: "bold",
+                }
+              },
+              maxScale: 0,
+              minScale: 3000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.CC_NAME"
+              },
+            },
+            labelsVisible: true,
+            popupTemplate: {
+                // autocasts as new PopupTemplate()
+                title: "Circuit Court",
+                content: "County: {CC_NAME}",
+                overwriteActions: false
+              }
+        });
+          
+        // *****************************************************
+        // add District Attorney Feature Layer
+        // *****************************************************
+        
+        var layerDistrictAttorney = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/DistrictAttorney/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1.0,
+          title: "District Attorney",
+          visible: false,
+          maxScale: 0,
+          minScale: 5000000,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 1.5,
+                  color: "#4fc3f7"
+                }
+              }
+            },
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "#4fc3f7",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "sans-serif",
+                  size: 8,
+                  weight: "bold",
+                }
+              },
+              maxScale: 0,
+              minScale: 3000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.DA_Name"
+              },
+            },
+            labelsVisible: true,
+            popupTemplate: {
+                // autocasts as new PopupTemplate()
+                title: "District Attorney",
+                content: "{DA_Name}",
+                overwriteActions: false
+              }
+        });
+          
+        // *****************************************************
+        // add Court of Appeals Feature Layer
+        // *****************************************************
+          
+        const COARenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Court of Appeals"
+          },
+          field: "COA_Dist",
+          uniqueValueInfos: [{
+            value: "Court of Appeals District 1",
+            label: "District 1",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              style: "solid"
+            }
+          }, {
+            value: "Court of Appeals District 2",
+            label: "District 2",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "Court of Appeals District 3",
+            label: "District 3",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              style: "solid"
+            }
+          }, {
+            value: "Court of Appeals District 4",
+            label: "District 4",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          },]
+        };
+          
+        var layerCourtAppeals = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/CourtofAppeals/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 0.6,
+          title: "Court of Appeals",
+          visible: false,
+          maxScale: 0,
+          minScale: 5000000,
+          renderer: COARenderer,
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "sans-serif",
+                  size: 8,
+                  weight: "bold",
+                }
+              },
+              maxScale: 0,
+              minScale: 3000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.COA_Dist"
+              },
+            },
+            labelsVisible: true,
+            popupTemplate: {
+                // autocasts as new PopupTemplate()
+                title: "Court of Appeals",
+                content: "{COA_Dist}",
+                overwriteActions: false
+              }
+        });
+          
+        // *****************************************************
+        // add Schools Feature Layer
+        // *****************************************************
+        
+       
+        function schoolFillSymbol(value, color) {
+            return {
+              "value": value,
+              "symbol": {
+                "color": null,
+                "type": "simple-fill",
+                "style": "solid",
+                "outline": {
+                  width: 2,
+                  color: color
+                }
+              },
+              "label": value
+            };
+        }  
+          
+        //Define the schools display renderer
+        var schoolRenderer = {
+        type: "unique-value",
+        field: "TYPE",
+        uniqueValueInfos: [
+          schoolFillSymbol("Unified", "#f603a3"),
+          schoolFillSymbol("Elementary", "#ca8dfd"),
+        ]
+      };
+          
+        // add the schools featurelayer
+        var layerSchools = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_SchoolDistricts/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1,
+          title: "School Districts",
+          visible: false,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "School District",
+            content: "District Name: {SDNM} </br> {Union_HS} </br> School District Type: {TYPE}",
+            overwriteActions: false
+          },
+          minScale: 600000,
+          maxScale: 0,
+          renderer: schoolRenderer, 
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "#f603a3",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              labelsVisible: true,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.SDNM + TextFormatting.NewLine + $feature.Union_HS"
+              }
+            }
+        });
+          
+        // *****************************************************
+        // add Municipalities Feature Layer
+        // *****************************************************
+        
+        //set municipality fills
+        function muniFillSymbol(value, color, outline) {
+            return {
+              "value": value,
+              "symbol": {
+                "color": color,
+                "type": "simple-fill",
+                "style": "solid",
+                "outline": {
+                  width: 2,
+                  color: outline
+                }
+              },
+              "label": value
+            };
+        }  
+          
+        //Define the schools display renderer
+        var muniRenderer = {
+        type: "unique-value",
+        field: "MuniType",
+        uniqueValueInfos: [
+          muniFillSymbol("Town", null, "#D3D3D3"),
+          muniFillSymbol("Village", null, "#D3D3D3"),
+          muniFillSymbol("City", null, "#D3D3D3")
+        ]
+      };
+          
+        // add the park trails featurelayer
+        var layerMunis = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Municipality_CombinedCounty/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1.0,
+          title: "Municipalities",
+          visible: true,
+          minScale: 600000,
+          maxScale: 0,
+          renderer: muniRenderer,
+          labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "#333333",
+                haloColor: "#e0e0e0",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "Merriweather",
+                  size: 8,
+                  weight: "bold"
+                }
+              },
+              maxScale: 0,
+              minScale: 300000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.MuniName"
+              },
+            },
+            labelsVisible: true,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "{Label}",
+          }
+        });
+          
+        // *****************************************************
+        // add Counties Feature Layer
+        // *****************************************************
+        
+        var layerCounties = new FeatureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_Counties/FeatureServer/0",
+          //outFields: ["*"],
+          opacity: 1.0,
+          title: "Counties",
+          visible: true,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 2.5,
+                  color: "black"
+                }
+              }
+            },
+            
+            labelingInfo: {
+              // autocasts as new LabelClass()
+              symbol: {
+                type: "text", // autocasts as new TextSymbol()
+                color: "black",
+                haloColor: "white",
+                haloSize: 1,
+                font: {
+                  // autocast as new Font()
+                  family: "sans-serif",
+                  size: 10,
+                  weight: "bold",
+                }
+              },
+              maxScale: 0,
+              minScale: 5000000,
+              deconflictionStrategy: "dynamicNeverRemove",
+              labelExpressionInfo: {
+                expression: "$feature.CNTY_NAME"
+              },
+            },
+            labelsVisible: true,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "{CNTY_NAME} County",
           }
         });
         
-        // add the park fire history featurelayer
-        var layerFireHistory = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_fhst/FeatureServer/0",
-          //outFields: ["*"],
-          opacity: 0.8,
-          title: "Fire History",
-          visible: false,
+        // *****************************************************
+        // add Custom Basemap from Vector Tile Layer
+        // *****************************************************
+          
+        // Light Gray
+        var lightGrayLayer = new VectorTileLayer({
+          // URL to the style of vector tiles
+          url: "https://uw-mad.maps.arcgis.com/sharing/rest/content/items/b941c095c56c44b98c699550038bc1f0/resources/styles/root.json"
+          
+        });
+
+        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
+        //the image in the BasemapToggle widget.
+        var lightGrayBasemap = new Basemap({
+          baseLayers: [lightGrayLayer],
+          title: "Light Gray",
+          
+          //id: "terrain",
+          thumbnailUrl: "img/LightGray_NoLabels.png",
+        });  
+          
+        // Topo Layer
+        var topoLayer = new VectorTileLayer({
+          // URL to the style of vector tiles
+          url: "https://uw-mad.maps.arcgis.com/sharing/rest/content/items/7fc191a9ff7b48df863ef038909a6a8a/resources/styles/root.json"
+          
+        });
+
+        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
+        //the image in the BasemapToggle widget.
+        var topoBasemap = new Basemap({
+          baseLayers: [topoLayer],
+          title: "Topographic",
+          //id: "terrain",
+          thumbnailUrl: "img/Topo_NoLabels.png",
         });
           
+//        // Aerial Photo from Mapbox
+//        var aerialLayer = new WebTileLayer({
+//          // URL to the style of vector tiles
+//          urlTemplate: "https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{level}/{col}/{row}"
+//        });
+
+        // Aerial Photo from Mapbox
+        var aerialLayer = new WebTileLayer({
+          // URL to the style of raster tiles
+          urlTemplate: "https://api.mapbox.com/styles/v1/tripleg373/cl6cwnikf003c14qnfhcy13z1/tiles/256/{level}/{col}/{row}@2x?access_token=pk.eyJ1IjoidHJpcGxlZzM3MyIsImEiOiJjanprazZ0cHMwbHMyM29vYXk5ZGlnNGNvIn0.UYb-wxnQA4qlVCD8Ayg6ow",
+          copyright: "© OpenStreetMap contributors Design © Mapbox"
+        });
+          
+        //Create a Basemap with the WebTileLayer. The thumbnailUrl will be used for
+        //the image in the BasemapToggle widget.
+        var aerialBasemap = new Basemap({
+          baseLayers: [aerialLayer],
+          title: "Imagery with Labels",
+          //id: "terrain",
+          thumbnailUrl: "img/MapboxAerial.png",
+        });
+          
+        
+        
+        // *****************************************************
+        // Define the Map Display
+        // *****************************************************
+              
         // Create the Map
         const map = new Map({
-          basemap: "topo-vector",
-          layers: [layerBoundary, layerFireHistory, layerGroves, layerTrails, layerRoads, layerPOI]
+          basemap: lightGrayBasemap,
+          layers: [layerMunis, layerCounties, layerCourtAppeals, layerDistrictAttorney, layerCircuitCourt, layerMJJ, layerTechCollege, layerCongressional, layerSenate, layerAssembly, layerCountySup, layerAldermanic, layerDistrictCombos, layerSanitary, layerSchools, layerWards]
         });
           
-        let editor, features, editExpand, filterLayerView, queryLayerView;
+        let editor, features, editExpand;
           
           
         // *****************************************************
@@ -348,170 +1837,34 @@
             
             
         }
+
         // *****************************************************
-        // Creates actions in the LayerList
+        // Set up the Default MapView
         // *****************************************************
-
-        function defineActions(event) {
-          // The event object contains an item property.
-          // is is a ListItem referencing the associated layer
-          // and other properties. You can control the visibility of the
-          // item, its title, and actions using this object.
-
-          const item = event.item;
-
-          if (item.title === "SEKI Layers") {
-            // An array of objects defining actions to place in the LayerList.
-            // By making this array two-dimensional, you can separate similar
-            // actions into separate groups with a breaking line.
-
-            item.actionsSections = [
-              [
-                {
-                  title: "Go to full extent",
-                  className: "esri-icon-zoom-out-fixed",
-                  id: "full-extent"
-                },
-                {
-                  title: "Layer information",
-                  className: "esri-icon-description",
-                  id: "information"
-                }
-              ],
-//              [
-//                {
-//                  title: "Increase opacity",
-//                  className: "esri-icon-up",
-//                  id: "increase-opacity"
-//                },
-//                {
-//                  title: "Decrease opacity",
-//                  className: "esri-icon-down",
-//                  id: "decrease-opacity"
-//                }
-//              ]
-            ];
-          }
-        }
-        
           
-        /*************************************************************
-         * The PopupTemplate content is the text that appears inside the
-         * popup. Bracketed {fieldName} can be used to reference the value
-         * of an attribute of the selected feature. HTML elements can be
-         * used to provide structure and styles within the content.
-         **************************************************************/
-        const editThisAction = {
-          title: "Edit feature",
-          id: "edit-this",
-          className: "esri-icon-edit"
-        };
-
-        // Create a popupTemplate for the featurelayer and pass in a function to set its content and specify an action to handle editing the selected feature
-        const template = {
-          title: "User Name: {UserName}",
-          content: OverallConLevel,
-          fieldInfos: [
-            {
-              fieldName: "UserName"
-            },
-            {
-              fieldName: "OverallCon"
-            }
-          ],
-          //actions: [editThisAction]
-        };
-
-        // Function that creates two popup elements for the template: attachments and text
-        function OverallConLevel(feature) {
-          // 1. Set how the attachments should display within the popup
-          const attachmentsElement = new AttachmentsContent({
-            displayType: "list"
-          });
-
-          const textElement = new TextContent();
-
-          
-        }
-        // View how each marker
-        // symbol is created for Points of Interest
-        const layerTreesRenderer = {
-          type: "unique-value",
-          field: "OverallCon",
-          uniqueValueInfos: [
-            {
-              value: "Excellent",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-excellent.svg",
-                contentType: "image/svg",  
-              }   
-            },
-            {
-              value: "Good",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-good.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Average",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-average.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Poor",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-poor.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Fallen",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-fallen.svg",
-                contentType: "image/svg",
-              }
-            },
-            
-          ]
-        };
-
-        var layerTrees = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_trees/FeatureServer/0",
-          outFields: ["*"],
-          title: "Sequoia Trees",
-          visible: true,
-          renderer: layerTreesRenderer,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "Tree Condition - {OverallCon}",
-            content: "</br>Grove: {GroveName} </br>Tree Diameter: {TreeDiam} </br>Surface Fuel Level: {SurFuel} </br>Burn Damage: {BurnDamage} </br>Collector Name: {UserName} </br>Collector Role: {UserType}",
-            overwriteActions: false
-          }
-          //popupTemplate: template
-        });
-        map.add(layerTrees);
-
         // Create the MapView
         const view = new MapView({
           container: "viewDiv",
           map: map,
-          zoom: 11,
-          center: [-118.59, 36.60]
+          environment: {
+            lighting: {
+              directShadowsEnabled: true
+            }
+          },
+          zoom: 6,
+          highlightOptions: {
+            fillOpacity: 0.1,
+            shadowColor: "cyan",
+            haloOpacity: 1
+          },
+          center: [-89.5, 44.60]
         });
           
         setupView();
         
         view.popup.dockOptions = {
               // Disable the dock button so users cannot undock the popup
-              position: "bottom-right",
+              position: "bottom-left",
         };
           
         // *****************************************************
@@ -519,18 +1872,125 @@
         // and add it to the top-right corner of the view.
         // *****************************************************
         
+          //Define additional functions section of the layerlist
+          function defineActions(event) {
+              // The event object contains an item property.
+              // is is a ListItem referencing the associated layer
+              // and other properties. You can control the visibility of the
+              // item, its title, and actions using this object.
+
+              const item = event.item;
+
+                item.actionsSections = [
+                  [
+                    {
+                      title: "Toggle Labels",
+                      className: "esri-icon-labels",
+                      id: "labels"
+                    },
+//                    {
+//                      title: "Layer information",
+//                      className: "esri-icon-description",
+//                      id: "information"
+//                    }
+                  ],
+//                  [
+//                    {
+//                      title: "Increase opacity",
+//                      className: "esri-icon-up",
+//                      id: "increase-opacity"
+//                    },
+//                    {
+//                      title: "Decrease opacity",
+//                      className: "esri-icon-down",
+//                      id: "decrease-opacity"
+//                    }
+//                  ]
+                ];
+              //}
+          
+          
+              // Adds a slider for updating a group layer's opacity
+              //if (item.children.length > 1 && item.parent) {
+                const slider = new Slider({
+                  min: 0,
+                  max: 1,
+                  precision: 2,
+                  //steps: 0.2,
+                  values: [1],
+                  snapOnClickEnabled: true,
+                  visibleElements: {
+                    labels: true,
+                    rangeLabels: true
+                  }
+                });
+
+                item.panel = {
+                  content: [
+                      slider,
+                      
+                  ],
+                  className: "esri-icon-sliders-horizontal",
+                  title: "Change Layer Opacity"
+                };
+
+                slider.on("thumb-drag", (event) => {
+                  const { value } = event;
+                  item.layer.opacity = value;
+                });
+              //}
+          }
+          
           // LayerList
           layerList = new LayerList({
               container: document.createElement("div"),
-              view: view
+              view: view,
+              listItemCreatedFunction: defineActions
             });
+          
+          // Event listener that fires each time an action is triggered
+
+          layerList.on("trigger-action", (event) => {
+            // The layer visible in the view at the time of the trigger.
+            //const visibleLayer = layerCounties.visible;
+
+            // Capture the action id.
+            const id = event.action.id; 
+            
+            const logo = event.action.className
+            console.log(event.action.className)
+            
+            
+
+                
+            //toggle labels for each layer on and off
+            if (id === "labels") {
+              if (event.item.layer.labelsVisible  === false) {
+                event.item.layer.labelsVisible = true;
+                event.action.className = "esri-icon-labels";
+                  console.log(logo)
+              } else {
+                event.item.layer.labelsVisible = false
+                event.action.className = "esri-icon-deny";
+        
+              }
+            }
+              
+              
+//             else if (id === "information") {
+//              // if the information action is triggered, then
+//              // open the item details page of the service layer
+//              window.open(visibleLayer.url);
+//            } 
+          });
+          
             
           let layerListExpand = new Expand({
               expandIconClass: "esri-icon-layers",
-              expandTooltip: "Expand Layer List",
+              expandTooltip: "Expand Districts List",
               view: view,
               expanded: false,
-              content: layerList,
+              content: layerList.container,
               mode: "floating",
               group: "top-right"
             });
@@ -539,7 +1999,7 @@
           layerListExpand.watch("expanded", () => {
             if (layerListExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Click the layer name or eye icon to turn that layer on/off.";
+              fieldNameText.textContent = "Click the layer name or checkbox to turn that layer on/off.";
             }
             //clear the filters when user closes the expand widget  
             if (!layerListExpand.expanded) {
@@ -549,18 +2009,7 @@
           });
 
           
-        // *****************************************************
-        // Create the Basemap Toggle widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
         
-        let basemapToggle = new BasemapToggle({
-          view: view,  // The view that provides access to the map's "streets-vector" basemap
-          nextBasemap: "hybrid"  // Allows for toggling to the "hybrid" basemap
-        });
-          
-        // Add widget to the top right corner of the view
-        view.ui.add(basemapToggle, "bottom-left");
           
         // *****************************************************
         // Create tooltip widget with the associated actions
@@ -572,7 +2021,7 @@
           
         
         let tooltipExpand = new Expand({
-              expandIconClass: "esri-icon-comment",
+              expandIconClass: "esri-icon-question",
               expandTooltip: "Expand Tooltip",
               view: view,
               expanded: true,
@@ -586,6 +2035,67 @@
             position: "top-left",
             //index: 1
             });
+          
+        // *****************************************************
+        // Create print widget with the associated actions
+        // and add it to the top-right corner of the view.
+        // ***************************************************** 
+        
+        templateOptions = new TemplateOptions({
+              forceFeatureAttributes: false,
+        }); 
+          
+        //add print information
+        let printMap = new Print({
+            view: view,
+            templateOptions: templateOptions,
+            // specify your own print service
+            printServiceUrl:
+                "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        });
+          
+        
+
+        
+        let printExpand = new Expand({
+              expandIconClass: "esri-icon-printer",
+              expandTooltip: "Expand Print/Export",
+              view: view,
+              expanded: false,
+              content: printMap ,
+              mode: "floating",
+              group: "top-left"
+            });
+          
+        //add text information
+          view.ui.add(printExpand, {
+            position: "top-left",
+            //index: 1
+            });
+          
+        // *****************************************************
+        // Create the Basemap widget with the associated actions
+        // and add it to the top-right corner of the view.
+        // *****************************************************
+        
+          
+        var basemapGallery = new BasemapGallery({
+            view: view,
+            source: [lightGrayBasemap, topoBasemap, aerialBasemap, Basemap.fromId("arcgis-imagery"), Basemap.fromId("arcgis-imagery-standard")] // autocasts to LocalBasemapsSource
+        });
+          
+        let basemapExpand = new Expand({
+              expandIconClass: "esri-icon-basemap",
+              expandTooltip: "Expand Basemap Gallery",
+              view: view,
+              expanded: false,
+              content: basemapGallery,
+              mode: "floating",
+              group: "top-left"
+            });
+          
+        // Add widget to the top right corner of the view
+        view.ui.add(basemapExpand, "top-left");
         
         // *****************************************************
         // Create and intro message widget with the associated actions
@@ -654,38 +2164,61 @@
           includeDefaultSources: false,
           sources: [
             {
-              layer: layerPOI,
-              searchFields: ["POINAME"],
-              displayField: "POINAME",
-              exactMatch: false,
-              outFields: ["POINAME", "POITYPE"],
-              name: "Point of Interest",
-              zoomScale: 10000,
-              placeholder: "Example: Sherman Tree"
-
-            },
-            {
-              layer: layerGroves,
-              searchFields: ["Grove_Name"],
-              //suggestionTemplate: "{Grove_Name}",
-              exactMatch: false,
-              //outFields: ["Grove_Name"],
-              resultGraphicEnabled: false,
-              placeholder: "Example: Atwell",
-              name: "Sequoia Grove",
-
-            },
-            {
-              layer: layerTrails,
-              searchFields: ["TRLNAME"],
+              layer: layerCounties,
+              searchFields: ["CNTY_NAME"],
+              displayField: "CNTY_NAME",
               //suggestionTemplate: "{Name}, Party: {Party}",
               exactMatch: false,
-              outFields: ["TRLNAME", "TRLCLASS"],
-              placeholder: "Example: Giant Forest",
-              name: "SEKI Trails",
+              outFields: ["CNTY_NAME"],
+              placeholder: "Example: ADAMS",
+              name: "County",
+
+            },
+            {
+              layer: layerMunis,
+              searchFields: ["MuniName"],
+              displayField: "Label",
+              exactMatch: false,
+              //outFields: ["POINAME", "POITYPE"],
+              name: "Municipality",
+              //zoomScale: 10000,
+              placeholder: "Example: Madison"
+
+            },
+            
+            {
+              layer: layerSchools,
+              searchFields: ["SDNM"],
+              displayField: "SDNM",
+              //suggestionTemplate: "{Name}, Party: {Party}",
+              exactMatch: false,
+              outFields: ["SDNM"],
+              placeholder: "Example: D C Everest",
+              name: "School District",
 
             },
           ]
+        });
+          
+        //turn on layers when searched if they aren't already on  
+        searchWidget.on("select-result", function(event){
+            console.log(event.source.layer)
+            //turn on schools layer if searched
+            if (event.source.layer === layerSchools) {
+              if (layerSchools.visible  === false) {
+                layerSchools.visible = true;  
+              }
+            };
+            if (event.source.layer === layerMunis) {
+              if (layerMunis.visible  === false) {
+                layerMunis.visible = true;  
+              }
+            };
+            if (event.source.layer === layerCounties) {
+              if (layerCounties.visible  === false) {
+                layerCounties.visible = true;  
+              }
+            };
         });
           
         //expand widget
@@ -712,1341 +2245,318 @@
             }
           });
 
-      
           
-        // *****************************************************
-        // Create the Editor widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-
-        view.when(() => {
-          // Create the Editor with the specified layer and a list of field configurations
-          var editor = new Editor({
-            view: view,
-            container: document.createElement("div"),
-            supportingWidgetDefaults: {
-              featureTemplates: {
-                visibleElements: {
-                    filter: false, // disable the default filter UI
-                }
-              }
-            },
-                
-            layerInfos: [
-              {
-                layer: layerTrees,
-                
-                formTemplate: {
-                  // autocasts to FormTemplate
-                  elements: [
-                    // autocasts to FieldElement
-                    {
-                      type: "field",
-                      fieldName: "UserName",
-                      label: "User Name",
-                      editable: true,
-                      hint: "Enter your name"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "UserType",
-                      label: "User Type",
-                      hint: "Select user role"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "GroveName",
-                      label: "Grove Name",
-                      hint: "Select grove location"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "TreeDiam",
-                      label: "Tree Diameter",
-                      hint: "Select trunk thickness"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "SurFuel",
-                      label: "Surface Fuel",
-                      hint: "Select fuel buildup level"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "BurnDamage",
-                      label: "Burn Damage",
-                      hint: "Select tree burn damage"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "OverallCon",
-                      label: "Overall Condition",
-                      hint: "Select overall condition"
-                    },
-                    
-                  ]
-                }
-              }
-            ]
-          });
-            
-        //expand widget
-          editExpand = new Expand({
-            expandIconClass: "esri-icon-edit",
-            expandTooltip: "Expand Tree Editor",
-            expanded: false,
-            view: view,
-            content: editor,
-            mode: "floating",
-            group: "top-right"
-          });
-        
-        //add instruction information when user expands the widget
-          editExpand.watch("expanded", () => {
-            if (editExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Under Sequoia Trees, select the condition level and place a new tree location on map. Select Edit features option and click on existing point to change attribute information.";
-            }
-            //clear the filters when user closes the expand widget  
-            if (!editExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
-          });
+//        // *****************************************************
+//        // Create the Query widget with the associated actions
+//        // and add it to the top-right corner of the view.
+//        // *****************************************************
+          
+          
+          let layerMunisView = null;
+          let layerCountiesView = null;
+          let layerWardsView = null;
+          let highlight = null;
+          let query = null;
+          let geometry = null;
+          let graphics = null;
+          let handler
+          
+            //sets up interface for query
+            const queryElement = document.getElementById("queryDiv");
+            //turn on query tool
+            const turnOnQueryElement = document.getElementById("point-geometry-button");
+            //turn off query tool
+            const removeQueryElement = document.getElementById("clearFilter");
+          
+          // click event handler for query choices
+          turnOnQueryElement.addEventListener("click", queryLayers, true);
+          
+          
+          //remove the event listener
+          removeQueryElement.addEventListener("click", clearFilter, true);
             
           
-            
-        });
           
-        // *****************************************************
-        // Create the Query widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-        
-        
-
-        // additional query fields initially set to null for basic query
-        let distance = 0.5;
-        let units = "miles";
-
-        //create graphic for mouse point click
-        const pointGraphic = new Graphic({
-          symbol: {
-            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-            color: [0, 0, 139],
-            outline: {
-              color: [255, 255, 255],
-              width: 1.5
-            }
-          }
-        });
-
-        // Create graphic for distance buffer
-        const bufferGraphic = new Graphic({
-          symbol: {
-            type: "simple-fill", // autocasts as new SimpleFillSymbol()
-            color: [173, 216, 230, 0.2],
-            outline: {
-              // autocasts as new SimpleLineSymbol()
-              color: [255, 255, 255],
-              width: 1
-            }
-          }
-        });
-
-        // when query type changes, set appropriate values
-        var queryOpts = document.getElementById("query-type");
-
-        queryOpts.addEventListener("change", () => {
-          switch (queryOpts.value) {
-            // values set for distance query
-            case "OneMile":
-              distance = 1;
-              units = "miles";
-              break;
-            case "TwoMiles":
-              distance = 2;
-              units = "miles";
-              break;
-            case "FiveMiles":
-              distance = 5;
-              units = "miles";
-              break;
-            default:
-              // Default set to basic query
-              distance = 0.5;
-              units = "miles";
-          }
-        });
-        
-
-        function queryFeatures(screenPoint) {
-          const point = view.toMap(screenPoint);
-          layerPOI.queryFeatures({
-              geometry: point,
-              // distance and units will be null if basic query selected
-              distance: distance,
-              units: units,
-              spatialRelationship: "intersects",
-              returnGeometry: false,
-              returnQueryGeometry: true,
-              outFields: ["*"]
-            })
-            .then((featureSet) => {
-              // set graphic location to mouse pointer and add to mapview
-//              pointGraphic.geometry = point;
-//              view.graphics.add(pointGraphic);
+          
+          function clearFilter() {
+             
+              highlight.remove();
+              graphics = null;
+              queryLayers = null;
               
-              // open popup of query result
-              view.popup.open({
-                location: point,
-                features: featureSet.features,
-                featureMenuOpen: true
-              });
-              view.popup.dockOptions = {
-                  // Change position of the default docking
-                  position: "bottom-right",
-                };
-              // The popup will automatically be dockEnabled when made visible
-              view.popup.dockEnabled = true;
-              
-              if (featureSet.queryGeometry) {
-                bufferGraphic.geometry = featureSet.queryGeometry;
-                view.graphics.add(bufferGraphic);
-                view.goTo(bufferGraphic);
-              }
-            });
-        }
+              layerWardsView.filter = null;
+              layerDistrictCombosView.filter = null;
+              layerAldermanicView.filter = null;
+              layerCountySupView.filter = null;
+                
+          }
           
-        let queryExpand = new Expand({
-            view: view,
-            content: queryOpts,
-            mode: "floating",
-            expandTooltip: "Expand Query",
-            expandIconClass: "esri-icon-review",
-            group: "top-right"
+//        // get the selected spatialRelationship
+//            let layerFilter = "layerMunisViewFilter";
+//            document
+//              .getElementById("relationship-select")
+//              .addEventListener("change", (event) => {
+//                const select = event.target;
+//                spatialFilter = select.options[select.selectedIndex].value;
+//                updateFilter();
+//              });
+//          
+        // select the layer to filter on
+        let layerMunisViewFilterSelected = true;
+        document
+          .getElementById("layerMunisViewFilter")
+          .addEventListener("change", (event) => {
+            layerMunisViewFilterSelected = !!event.target.checked;
+            layerCountiesViewFilterSelected = false;
+            updateFilter();
           });
-          //start query tool when user clicks expand button
           
-          queryExpand.watch("expanded", () => {
-            if (queryExpand.expanded) {
-                mouseEvtHandler = view.on("click", (event) => {
-                    view.graphics.remove(pointGraphic);
-                    if (view.graphics.includes(bufferGraphic)) {
-                        view.graphics.remove(bufferGraphic);
-                    }
-                    
-                    queryFeatures(event);
-                });
-                var fieldNameText = document.getElementById('info');
-                fieldNameText.textContent = "Select a buffer distance and click a location on the map to return the Points of Interest within that distance.";
-            }
-            //clear the query when user closes the expand widget
-            if (!queryExpand.expanded) {
-                mouseEvtHandler.remove();
-                mouseEvtHandler = null;
-                view.graphics.remove(pointGraphic);
-                    if (view.graphics.includes(bufferGraphic)) {
-                        view.graphics.remove(bufferGraphic);
-                    }
-                var fieldNameText = document.getElementById('info');
-                fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
-          }); 
+        let layerCountiesViewFilterSelected = false;
+        document
+          .getElementById("layerCountiesViewFilter")
+          .addEventListener("change", (event) => {
+            layerCountiesViewFilterSelected = !!event.target.checked;
+            layerMunisViewFilterSelected = false;
+            
+            updateFilter();
+          });
           
-        // *****************************************************
-        // Create the Filter widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
           
-        const poisNodes = document.querySelectorAll(`.poi-item`);
-        const poisElement = document.getElementById("poi-filter");
-
-        // click event handler for pois choices
-        poisElement.addEventListener("click", filterBypoi);
-
-        // set an attribute filter on filter layer view
-        // to display the warnings issued in that poi
-        function filterBypoi(event) {
-          const selectedpoi = event.target.getAttribute("data-poi");
-          filterLayerView.filter = {
-            where: "POITYPE = '" + selectedpoi + "'"
+          
+          // set the geometry filter on the visible FeatureLayerView
+        function updateFilter() {
+          const featureFilter = {
+            spatialRelationship: spatialFilter
           };
+
+          //select the layer to filter by
+          if (layerMunisView) {
+            if (layerMunisViewFilterSelected) {
+              layerMunisView.filter = featureFilter;
+              
+            
+              
+            } else {
+              layerMunisView.filter = null;
+            }
+          }
+          if (layerCountiesView) {
+            if (layerCountiesViewFilterSelected) {
+              layerCountiesView.filter = featureFilter;
+              
+            } else {
+              layerCountiesView.filter = null;
+            }
+          }  
+            
         }
+          
+          // get the selected spatialRelationship
+            let spatialFilter = "contains";
+            document
+              .getElementById("relationship-select")
+              .addEventListener("change", (event) => {
+                const select = event.target;
+                spatialFilter = select.options[select.selectedIndex].value;
+                updateFilter();
+              });
+//        
+          function queryLayers (Map, FeatureLayer, MapView) {
+            console.log(layerMunisViewFilterSelected)
+            console.log(layerCountiesViewFilterSelected)
+              
+              if (layerMunisViewFilterSelected) {
+                  
+                  //Pick either Municipality or County
+                  view.whenLayerView(layerMunis).then(function(layerView) {
+                     layerSelectedView = layerView;
+                  });      
+              }
+              
 
-        view.whenLayerView(layerPOI).then((layerView) => {
-          // flash filter warnings layer loaded
-          // get a reference to the filter warnings layerview
-          filterLayerView = layerView;
+              if (layerCountiesViewFilterSelected) {
+                  
+                  //Pick either Municipality or County
+                  view.whenLayerView(layerCounties).then(function(layerView) {
+                     layerSelectedView = layerView;
+                  });      
+              }
+              
 
-          // set up UI items
-          poisElement.style.visibility = "visible";
-        
-          let poisExpand = new Expand({
-            view: view,
-            content: poisElement,
-            mode: "floating",
-            expandTooltip: "Expand Filter",
-            expandIconClass: "esri-icon-filter",
-            group: "top-right"
+          view.whenLayerView(layerWards).then(function(layerView) {
+             layerWardsView = layerView;
           });
-            
-          //add instruction information when user expands the widget
-          poisExpand.watch("expanded", () => {
-            if (poisExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Filter Point of Interest type by selecting from the list. Closing the Filter tool will reset to default.";
-            }
-            //clear the filters when user closes the expand widget  
-            if (!poisExpand.expanded) {
-              filterLayerView.filter = null;
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
+              
+          view.whenLayerView(layerDistrictCombos).then(function(layerView) {
+             layerDistrictCombosView = layerView;
           });
-          //view.ui.add(poisExpand, "top-right");
-          view.ui.add([infoToolbarExpand, editExpand, legendExpand, searchExpand, poisExpand, queryExpand, layerListExpand], "top-right");
-            
-        });
-          
-        
-        
-        
-          
-          
-        
-      });
-    </script>
-  </head>
+              
+          view.whenLayerView(layerAldermanic).then(function(layerView) {
+             layerAldermanicView = layerView;
+          });
+              
+          view.whenLayerView(layerCountySup).then(function(layerView) {
+             layerCountySupView = layerView;
+          });
+              
 
-  <body>
-    <body class="sassy-theme">
-        <div id="viewDiv"></div>
-    <div id="info" class="esri-widget">   
-      Select a tool on the right to use that specific function.
-    </div>
-    <div id="infoToolbar" class="esri-widget">
-        <div class="image"></div>
-        <h3>Tree Locator Application</h3>
-        The Giant Sequoia is the most massive type of tree in the world. While it is well adapted to natural fire conditions, because of changing climate conditions and fire supression methods, the Sequoia are at much greater risk of destructive fires today, including those in the summer of 2021. As a result, the park has decided to task both its own staff and volunteers to inventory the Giant Sequoias within the known groves in the park.
-        <br><br>
-        To use this application, click on the tools to the right of the map. The primary tool is an editor tool to add a new tree entry or edit existing information. There is also a filter for Points of Interest and a query tool to find Points of Interest near the user's location. Finally, there are tools for searching for locations, turning on/off data layers and for viewing a legend.
-        <br>
-        <h6>Data and symbology courtesy National Park Service. Created by Greg Grube for Geography 777 at UW-Madison, Spring 2022.</h6>
+          var handler = view.on("click", (event) => {
+            const query = {
+              geometry: event.mapPoint,
+              returnGeometry: true,
+              //spatialRelationship: "intersects",
+            };
+              
+            layerSelectedView.queryFeatures(query).then((results) => {
+              if (results.features.length > 0) {
+                if (highlight) {
+                  highlight.remove();
+                }
+                // highlight query results
+                highlight = layerSelectedView.highlight(results.features);
 
-    </div>
-    <div id="poi-filter" class="esri-widget">
-      <div class="poi-item visible-poi" data-poi="Restroom">Restroom</div>
-      <div class="poi-item visible-poi" data-poi="Ranger Station">Ranger Station</div>
-      <div class="poi-item visible-poi" data-poi="Trailhead">Trailhead</div>
-      <div class="poi-item visible-poi" data-poi="Campground">Campground</div>
-      <div class="poi-item visible-poi" data-poi="Telephone">Telephone</div>
-      <div class="poi-item visible-poi" data-poi="Picnic Area">Picnic Area</div>
-      <div class="poi-item visible-poi" data-poi="Store">Store</div>
-      <div class="poi-item visible-poi" data-poi="Lodge">Lodge</div>
-      <div class="poi-item visible-poi" data-poi="Entrance Station">Entrance Station</div>
-      <div class="poi-item visible-poi" data-poi="Visitor Center">Visitor Center</div>
-    </div>
-    <div id="optionsDiv" class="esri-widget">
-      <select id="query-type" class="esri-widget">
-        <option value="distance">1/2 Mile</option>
-        <option value="OneMile">One Mile</option>
-        <option value="TwoMiles">Two Miles</option>
-        <option value="FiveMiles">Five Miles</option>
-        
-      </select>
-        
-        
-    </div>
-  </body>
-=======
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
-    <title>
-      Sequoia and Kings Canyon Tree Locator
-    </title>
+                layerWardsView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: spatialFilter,
+                  distance: 2 * view.resolution
+                };
+                  
+                layerDistrictCombosView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: spatialFilter,
+                  distance: 2 * view.resolution
+                };
+                  
+                layerAldermanicView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: spatialFilter,
+                  distance: 2 * view.resolution
+                };
+                  
+                layerCountySupView.filter = {
+                  geometry: results.features[0].geometry,
+                  spatialRelationship: spatialFilter,
+                  distance: 4 * view.resolution
+                };
+                
+                
+              }
+             });
+             //remove the click on event
+             handler.remove();
+              
+          });
 
-    <link
-      rel="stylesheet"
-      href="https://js.arcgis.com/4.23/esri/themes/dark/main.css"
-    />
-    <script src="https://js.arcgis.com/4.23/"></script>
-
-    <style>
-      html,
-      body,
-        
-      #viewDiv {
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        width: 100%;
-      }
-
-      #info {
-        height: 100%;
-        padding: 14px;
-        border-radius: 5px;
-        width: 120px;
-        font-weight: bold;
-      }
-        
-      #infoToolbar {
-        padding: 14px;
-        border-radius: 5px;
-        width: 250px;
-        text-align: center;
-        
-      }
-        
-      #query-type {
-        padding: 8px;
-        border-radius: 5px;
-        width: 120px;
-      }
-        
-     #pois-filter {
-        height: 120px;
-        width: 100%;
-        visibility: hidden;
-      }
-
-      .poi-item {
-        width: 125px;
-        padding: 13px;
-        text-align: center;
-        vertical-align: baseline;
-        cursor: pointer;
-        height: 40px;
-        font-size: 13px;
-      }
-
-      .poi-item:focus {
-        background-color: dimgrey;
-      }
-
-      .poi-item:hover {
-        background-color: dimgrey;
-      }
-        
-      div.image::before {
-        content:url("img/SEKI_logo.PNG");
-      }
-      
-        
-    .esri-editor .esri-item-list__scroller {
-        max-height: 100%;
-        max-width: 250px;
-      }
-        
-      .esri-view-height-small .esri-expand .esri-widget--panel, .esri-view-height-small .esri-expand .esri-widget--panel-height-only, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel-height-only {
-          max-height: 650px;
-          min-height: 60%;
-          max-width: 250px;
-      }
-      .esri-ui .esri-editor .esri-item-list__scroller {
-          max-height: 100%;
-          max-width: 250px;
-      }    
-        
-    </style>
-    <script>
-      require([
-        "esri/Map",
-        "esri/layers/FeatureLayer",
-        "esri/widgets/Editor",
-        "esri/widgets/LayerList",
-        "esri/views/MapView",
-        "esri/popup/content/AttachmentsContent",
-        "esri/popup/content/TextContent",
-        "esri/widgets/Expand",
-        "esri/widgets/Home",
-        "esri/widgets/Search",
-        "esri/Viewpoint",
-        "esri/widgets/Locate",
-        "esri/layers/GraphicsLayer",
-        "esri/Graphic",
-        "esri/symbols/SimpleFillSymbol",
-        "esri/symbols/SimpleMarkerSymbol",
-        "esri/widgets/BasemapToggle",
-        "esri/widgets/Legend",
-        "esri/widgets/FeatureTemplates",
-        "esri/config",
-        
-          
-        "dojo/on",
-        "dojo/dom",
-        "dojo/dom-construct",
-        "dojo/domReady!"
-      ], (
-        Map,
-        FeatureLayer,
-        Editor,
-        LayerList,
-        MapView,
-        AttachmentsContent,
-        TextContent,
-        Expand,
-        Home,
-        Search,
-        Viewpoint,
-        Locate,
-        GraphicsLayer,
-        Graphic,
-        SimpleFillSymbol,
-        SimpleMarkerSymbol,
-        BasemapToggle,
-        Legend,
-        FeatureTemplates,
-        esriConfig,
-        on, dom, domConstruct
-      ) => {
-          
-        esriConfig.apiKey = "AAPKd7a5f0028e3d432faec9c8e03740f0d8ntcrv-SGuCaGKZrLrQxv4azO6TaiERQO5QwoBDUznyrB6hxLK2EZe7oCwvq7bldk";
-          
-        // add the park outline featurelayer
-        var layerBoundary = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_boundary/FeatureServer/0",
-          //outFields: ["*"],
-          opacity: 0.3,
-          title: "Park Boundaries",
-          visible: true
-        });
-          
-        // add the park groves featurelayer
-        var layerGroves = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/CA_SEGI_groves/FeatureServer/0",
-          //outFields: ["*"],
-          opacity: 0.5,
-          title: "Sequoia Groves",
-          visible: true,
-//          labelingInfo: {
-//            // autocasts as new PopupTemplate()
-//            title: "{Grove_Name}",
-            overwriteActions: true
+//          function drawPoint() {
+//            if (highlight) {
+//              highlight.remove();
+//            }
+//            const action = draw.create("point");
+//
+//            // Give a visual feedback to users as they move the pointer over the view
+//            action.on("cursor-update", function (evt) {
+//              view.graphics.removeAll();
+//              drawPnt = new Point({
+//                x: evt.coordinates[0],
+//                y: evt.coordinates[1],
+//                spatialReference: view.spatialReference
+//              });
+//              graphic = new Graphic({
+//                geometry: drawPnt,
+//                symbol: sym
+//              });
+//              view.graphics.add(graphic);
+//              if(ctrlKey && !evt.native.ctrlKey){
+//                draw.reset();
+//                view.graphics.removeAll();
+//                selectMunis();
+//              }
+//            });
+//
+//            action.on("draw-complete", function (evt) {
+//              if (evt.native.ctrlKey) {
+//                ctrlKey = true;
+//              }else{
+//                ctrlKey = false;
+//              }
+//              drawPnt = new Point({
+//                x: evt.coordinates[0],
+//                y: evt.coordinates[1],
+//                spatialReference: view.spatialReference
+//              });
+//
+//              graphic = new Graphic({
+//                geometry: drawPnt,
+//                symbol: sym
+//              });
+//              pntGraphics.add(graphic);
+//              if (evt.native.ctrlKey) {
+//                drawPoint();
+//              } else {
+//                view.graphics.removeAll();
+//                selectMunis();
+//              }
+//            });
+//            view.focus();
+//          };
+//
+//          function selectMunis(){
+//            let mp = new Multipoint({
+//              spatialReference: view.spatialReference
+//            });
+//            let pntArray = pntGraphics.graphics.map(function(gra){
+//              mp.addPoint(gra.geometry);
+//            });
+//
+//            const query = {
+//              geometry: mp,
+//              outFields: ["*"],
+//              outSpatialReference: view.spatialReference,
+//              returnGeometry: true
+//            };
+//            // let query = layerMunis.createQuery();
+//            // query.geometry = mp;
+//            // query.outSpatialReference = view.spatialReference;
+//            // query.returnGeometry = true;
+//            layerMunis.queryFeatures(query)
+//            .then(function(results){
+//              const graphics = results.features;
+//              // remove existing highlighted features
+//              if (highlight) {
+//                highlight.remove();
+//              }
+//
+//              // highlight query results
+//              highlight = layerMunisView.highlight(graphics);
+//              pntGraphics.removeAll();
+//            }).catch(function(err){
+//              console.error(err);
+//            })
 //          }
-        });
-        
-        // add the park roads featurelayer
-        var layerRoads = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_roads/FeatureServer/0",
-          //outFields: ["*"],
-          opacity: 0.8,
-          title: "Park Roads",
-          visible: true,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "Road: {RDNAME}",
-            content: "Road Class: {RDCLASS}",
-            overwriteActions: false
-          }
-        });
-        
-        // add the park trails featurelayer
-        var layerTrails = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_trails/FeatureServer/0",
-          //outFields: ["*"],
-          opacity: 0.8,
-          title: "Park Trails",
-          visible: true,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "Trail: {TRLNAME}",
-            content: "Trail {TRLCLASS}",
-            overwriteActions: false
-          }
-        });
+      };
           
-        // View how each marker
-        // symbol is created for Points of Interest
-        const layerPOIRenderer = {
-          type: "unique-value",
-          field: "POITYPE",
-          uniqueValueInfos: [
-            {
-              value: "Restroom",
-              symbol: {
-                type: "picture-marker",
-                url: "img/restrooms-black-22.svg",
-                contentType: "image/svg",  
-              }   
-            },
-            {
-              value: "Trailhead",
-              symbol: {
-                type: "picture-marker",
-                url: "img/trailhead-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Ranger Station",
-              symbol: {
-                type: "picture-marker",
-                url: "img/ranger-station-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Campground",
-              symbol: {
-                type: "picture-marker",
-                url: "img/campground-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Telephone",
-              symbol: {
-                type: "picture-marker",
-                url: "img/telephone-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Picnic Area",
-              symbol: {
-                type: "picture-marker",
-                url: "img/picnic-area-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Store",
-              symbol: {
-                type: "picture-marker",
-                url: "img/snack-bar-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Lodge",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sleeping-shelter-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Entrance Station",
-              symbol: {
-                type: "picture-marker",
-                url: "img/entrance-station-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Visitor Center",
-              symbol: {
-                type: "picture-marker",
-                url: "img/visitor-center-black-22.svg",
-                contentType: "image/svg",
-              }
-            },
-          ]
-        };
-        
-        // add the park points of interest featurelayer
-        var layerPOI = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_poi/FeatureServer/0",
-          outFields: ["POITYPE"],
-          title: "Points of Interest",
-          visible: true,
-          renderer: layerPOIRenderer,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "Feature: {POINAME}",
-            content: "Feature Type: {POITYPE}",
-            overwriteActions: false
-          }
-        });
-        
-        // add the park fire history featurelayer
-        var layerFireHistory = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_fhst/FeatureServer/0",
-          //outFields: ["*"],
-          opacity: 0.8,
-          title: "Fire History",
-          visible: false,
-        });
-          
-        // Create the Map
-        const map = new Map({
-          basemap: "topo-vector",
-          layers: [layerBoundary, layerFireHistory, layerGroves, layerTrails, layerRoads, layerPOI]
-        });
-          
-        let editor, features, editExpand, filterLayerView, queryLayerView;
-          
-          
-        // *****************************************************
-        // add homeButton and expand widgets to UI
-        // *****************************************************
-        function setupView() {
-            
-          // set home button view point to initial extent
-          var homeButton = new Home({
-            view: view
-          });
-          view.ui.add(homeButton, "top-left");
-            
-          var locateBtn = new Locate({
-            view: view,
-            goToOverride: function(view, options) {
-                options.target.scale = 1500;
-                return view.goTo(options.target);
-          }
-          });
-            
-          // Add the locate widget to the top left corner of the view
-          view.ui.add(locateBtn, {
-            position: "top-left"
-          });
-            
-            
-        }
-        // *****************************************************
-        // Creates actions in the LayerList
-        // *****************************************************
-
-        function defineActions(event) {
-          // The event object contains an item property.
-          // is is a ListItem referencing the associated layer
-          // and other properties. You can control the visibility of the
-          // item, its title, and actions using this object.
-
-          const item = event.item;
-
-          if (item.title === "SEKI Layers") {
-            // An array of objects defining actions to place in the LayerList.
-            // By making this array two-dimensional, you can separate similar
-            // actions into separate groups with a breaking line.
-
-            item.actionsSections = [
-              [
-                {
-                  title: "Go to full extent",
-                  className: "esri-icon-zoom-out-fixed",
-                  id: "full-extent"
-                },
-                {
-                  title: "Layer information",
-                  className: "esri-icon-description",
-                  id: "information"
-                }
-              ],
-//              [
-//                {
-//                  title: "Increase opacity",
-//                  className: "esri-icon-up",
-//                  id: "increase-opacity"
-//                },
-//                {
-//                  title: "Decrease opacity",
-//                  className: "esri-icon-down",
-//                  id: "decrease-opacity"
-//                }
-//              ]
-            ];
-          }
-        }
-        
-          
-        /*************************************************************
-         * The PopupTemplate content is the text that appears inside the
-         * popup. Bracketed {fieldName} can be used to reference the value
-         * of an attribute of the selected feature. HTML elements can be
-         * used to provide structure and styles within the content.
-         **************************************************************/
-        const editThisAction = {
-          title: "Edit feature",
-          id: "edit-this",
-          className: "esri-icon-edit"
-        };
-
-        // Create a popupTemplate for the featurelayer and pass in a function to set its content and specify an action to handle editing the selected feature
-        const template = {
-          title: "User Name: {UserName}",
-          content: OverallConLevel,
-          fieldInfos: [
-            {
-              fieldName: "UserName"
-            },
-            {
-              fieldName: "OverallCon"
-            }
-          ],
-          //actions: [editThisAction]
-        };
-
-        // Function that creates two popup elements for the template: attachments and text
-        function OverallConLevel(feature) {
-          // 1. Set how the attachments should display within the popup
-          const attachmentsElement = new AttachmentsContent({
-            displayType: "list"
-          });
-
-          const textElement = new TextContent();
-
-          
-        }
-        // View how each marker
-        // symbol is created for Points of Interest
-        const layerTreesRenderer = {
-          type: "unique-value",
-          field: "OverallCon",
-          uniqueValueInfos: [
-            {
-              value: "Excellent",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-excellent.svg",
-                contentType: "image/svg",  
-              }   
-            },
-            {
-              value: "Good",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-good.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Average",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-average.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Poor",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-poor.svg",
-                contentType: "image/svg",
-              }
-            },
-            {
-              value: "Fallen",
-              symbol: {
-                type: "picture-marker",
-                url: "img/sequoia-fallen.svg",
-                contentType: "image/svg",
-              }
-            },
-            
-          ]
-        };
-
-        var layerTrees = new FeatureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/seki_trees/FeatureServer/0",
-          outFields: ["*"],
-          title: "Sequoia Trees",
-          visible: true,
-          renderer: layerTreesRenderer,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "Tree Condition - {OverallCon}",
-            content: "</br>Grove: {GroveName} </br>Tree Diameter: {TreeDiam} </br>Surface Fuel Level: {SurFuel} </br>Burn Damage: {BurnDamage} </br>Collector Name: {UserName} </br>Collector Role: {UserType}",
-            overwriteActions: false
-          }
-          //popupTemplate: template
-        });
-        map.add(layerTrees);
-
-        // Create the MapView
-        const view = new MapView({
-          container: "viewDiv",
-          map: map,
-          zoom: 11,
-          center: [-118.59, 36.60]
-        });
-          
-        setupView();
-        
-        view.popup.dockOptions = {
-              // Disable the dock button so users cannot undock the popup
-              position: "bottom-right",
-        };
-          
-        // *****************************************************
-        // Create the LayerList widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-        
-          // LayerList
-          layerList = new LayerList({
-              container: document.createElement("div"),
-              view: view
-            });
-            
-          let layerListExpand = new Expand({
-              expandIconClass: "esri-icon-layers",
-              expandTooltip: "Expand Layer List",
-              view: view,
-              expanded: false,
-              content: layerList,
-              mode: "floating",
-              group: "top-right"
-            });
-          
-          //add instruction information when user expands the widget
-          layerListExpand.watch("expanded", () => {
-            if (layerListExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Click the layer name or eye icon to turn that layer on/off.";
-            }
-            //clear the filters when user closes the expand widget  
-            if (!layerListExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
-          });
-
-          
-        // *****************************************************
-        // Create the Basemap Toggle widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-        
-        let basemapToggle = new BasemapToggle({
-          view: view,  // The view that provides access to the map's "streets-vector" basemap
-          nextBasemap: "hybrid"  // Allows for toggling to the "hybrid" basemap
-        });
-          
-        // Add widget to the top right corner of the view
-        view.ui.add(basemapToggle, "bottom-left");
-          
-        // *****************************************************
-        // Create tooltip widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // ***************************************************** 
-        
-        //add text information
-        let tooltip = document.getElementById("info")
-          
-        
-        let tooltipExpand = new Expand({
-              expandIconClass: "esri-icon-comment",
-              expandTooltip: "Expand Tooltip",
-              view: view,
-              expanded: true,
-              content: tooltip,
-              mode: "floating",
-              group: "top-left"
-            });
-          
-        //add text information
-          view.ui.add(tooltipExpand, {
-            position: "top-left",
-            //index: 1
-            });
-        
-        // *****************************************************
-        // Create and intro message widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // ***************************************************** 
-        
-        //add text information
-        let infoToolbar = document.getElementById("infoToolbar")
-          
-        
-        let infoToolbarExpand = new Expand({
-              expandIconClass: "esri-icon-description",
-              expandTooltip: "Expand Information Panel",
-              view: view,
-              expanded: true,
-              content: infoToolbar,
-              mode: "floating",
-              group: "top-right"
-            });
-          
-
-          
-         
-        
-        // *****************************************************
-        // Create the legend widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // ***************************************************** 
-          
-        let legend = new Legend({
-            view: view,
-        });
-        
-        let legendExpand = new Expand({
-              expandIconClass: "esri-icon-legend",
-              expandTooltip: "Expand Legend",
-              view: view,
-              expanded: false,
-              content: legend,
-              mode: "floating",
-              group: "top-right"
-            });
-          
-          //add instruction information when user expands the widget
-          legendExpand.watch("expanded", () => {
-            if (legendExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "View symbology of all currently active layers";
-            }
-            //clear the filters when user closes the expand widget  
-            if (!legendExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
-          });
-        
-          
-        // *****************************************************
-        // Create the Search widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-          
-        var searchWidget = new Search({
-          view: view,
-          allPlaceholder: "Enter Location",
-          includeDefaultSources: false,
-          sources: [
-            {
-              layer: layerPOI,
-              searchFields: ["POINAME"],
-              displayField: "POINAME",
-              exactMatch: false,
-              outFields: ["POINAME", "POITYPE"],
-              name: "Point of Interest",
-              zoomScale: 10000,
-              placeholder: "Example: Sherman Tree"
-
-            },
-            {
-              layer: layerGroves,
-              searchFields: ["Grove_Name"],
-              //suggestionTemplate: "{Grove_Name}",
-              exactMatch: false,
-              //outFields: ["Grove_Name"],
-              resultGraphicEnabled: false,
-              placeholder: "Example: Atwell",
-              name: "Sequoia Grove",
-
-            },
-            {
-              layer: layerTrails,
-              searchFields: ["TRLNAME"],
-              //suggestionTemplate: "{Name}, Party: {Party}",
-              exactMatch: false,
-              outFields: ["TRLNAME", "TRLCLASS"],
-              placeholder: "Example: Giant Forest",
-              name: "SEKI Trails",
-
-            },
-          ]
-        });
-          
-        //expand widget
-          let searchExpand = new Expand({
-            expandIconClass: "esri-icon-search",
-            expandTooltip: "Expand Search",
-            expanded: false,
-            view: view,
-            mode: "floating",
-            content: searchWidget,
-            group: "top-right"
-          });
-          
-          //add instruction information when user expands the widget
-          searchExpand.watch("expanded", () => {
-            if (searchExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Click down arrow to select item type. To search, begin to type the first few letters of the feature and select from the list.";
-            }
-            //clear the filters when user closes the expand widget  
-            if (!searchExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
-          });
-
       
           
-        // *****************************************************
-        // Create the Editor widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
+//        // set an attribute filter on filter layer view
+//        // to display the warnings issued in that poi
+//        function filterBypoi(event) {
+//          const selectedpoi = event.target.getAttribute("data-poi");
+//          layerMunisView.filter = {
+//            where: "POITYPE = '" + selectedpoi + "'"
+//          };
+//        }
 
-        view.when(() => {
-          // Create the Editor with the specified layer and a list of field configurations
-          var editor = new Editor({
-            view: view,
-            container: document.createElement("div"),
-            supportingWidgetDefaults: {
-              featureTemplates: {
-                visibleElements: {
-                    filter: false, // disable the default filter UI
-                }
-              }
-            },
-                
-            layerInfos: [
-              {
-                layer: layerTrees,
-                
-                formTemplate: {
-                  // autocasts to FormTemplate
-                  elements: [
-                    // autocasts to FieldElement
-                    {
-                      type: "field",
-                      fieldName: "UserName",
-                      label: "User Name",
-                      editable: true,
-                      hint: "Enter your name"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "UserType",
-                      label: "User Type",
-                      hint: "Select user role"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "GroveName",
-                      label: "Grove Name",
-                      hint: "Select grove location"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "TreeDiam",
-                      label: "Tree Diameter",
-                      hint: "Select trunk thickness"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "SurFuel",
-                      label: "Surface Fuel",
-                      hint: "Select fuel buildup level"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "BurnDamage",
-                      label: "Burn Damage",
-                      hint: "Select tree burn damage"
-                    },
-                    {
-                      type: "field",
-                      fieldName: "OverallCon",
-                      label: "Overall Condition",
-                      hint: "Select overall condition"
-                    },
-                    
-                  ]
-                }
-              }
-            ]
-          });
-            
-        //expand widget
-          editExpand = new Expand({
-            expandIconClass: "esri-icon-edit",
-            expandTooltip: "Expand Tree Editor",
-            expanded: false,
-            view: view,
-            content: editor,
-            mode: "floating",
-            group: "top-right"
-          });
-        
-        //add instruction information when user expands the widget
-          editExpand.watch("expanded", () => {
-            if (editExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Under Sequoia Trees, select the condition level and place a new tree location on map. Select Edit features option and click on existing point to change attribute information.";
-            }
-            //clear the filters when user closes the expand widget  
-            if (!editExpand.expanded) {
-              var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
-          });
-            
-          
-            
-        });
-          
-        // *****************************************************
-        // Create the Query widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-        
-        
-
-        // additional query fields initially set to null for basic query
-        let distance = 0.5;
-        let units = "miles";
-
-        //create graphic for mouse point click
-        const pointGraphic = new Graphic({
-          symbol: {
-            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-            color: [0, 0, 139],
-            outline: {
-              color: [255, 255, 255],
-              width: 1.5
-            }
-          }
-        });
-
-        // Create graphic for distance buffer
-        const bufferGraphic = new Graphic({
-          symbol: {
-            type: "simple-fill", // autocasts as new SimpleFillSymbol()
-            color: [173, 216, 230, 0.2],
-            outline: {
-              // autocasts as new SimpleLineSymbol()
-              color: [255, 255, 255],
-              width: 1
-            }
-          }
-        });
-
-        // when query type changes, set appropriate values
-        var queryOpts = document.getElementById("query-type");
-
-        queryOpts.addEventListener("change", () => {
-          switch (queryOpts.value) {
-            // values set for distance query
-            case "OneMile":
-              distance = 1;
-              units = "miles";
-              break;
-            case "TwoMiles":
-              distance = 2;
-              units = "miles";
-              break;
-            case "FiveMiles":
-              distance = 5;
-              units = "miles";
-              break;
-            default:
-              // Default set to basic query
-              distance = 0.5;
-              units = "miles";
-          }
-        });
-        
-
-        function queryFeatures(screenPoint) {
-          const point = view.toMap(screenPoint);
-          layerPOI.queryFeatures({
-              geometry: point,
-              // distance and units will be null if basic query selected
-              distance: distance,
-              units: units,
-              spatialRelationship: "intersects",
-              returnGeometry: false,
-              returnQueryGeometry: true,
-              outFields: ["*"]
-            })
-            .then((featureSet) => {
-              // set graphic location to mouse pointer and add to mapview
-//              pointGraphic.geometry = point;
-//              view.graphics.add(pointGraphic);
-              
-              // open popup of query result
-              view.popup.open({
-                location: point,
-                features: featureSet.features,
-                featureMenuOpen: true
-              });
-              view.popup.dockOptions = {
-                  // Change position of the default docking
-                  position: "bottom-right",
-                };
-              // The popup will automatically be dockEnabled when made visible
-              view.popup.dockEnabled = true;
-              
-              if (featureSet.queryGeometry) {
-                bufferGraphic.geometry = featureSet.queryGeometry;
-                view.graphics.add(bufferGraphic);
-                view.goTo(bufferGraphic);
-              }
-            });
-        }
-          
-        let queryExpand = new Expand({
-            view: view,
-            content: queryOpts,
-            mode: "floating",
-            expandTooltip: "Expand Query",
-            expandIconClass: "esri-icon-review",
-            group: "top-right"
-          });
-          //start query tool when user clicks expand button
-          
-          queryExpand.watch("expanded", () => {
-            if (queryExpand.expanded) {
-                mouseEvtHandler = view.on("click", (event) => {
-                    view.graphics.remove(pointGraphic);
-                    if (view.graphics.includes(bufferGraphic)) {
-                        view.graphics.remove(bufferGraphic);
-                    }
-                    
-                    queryFeatures(event);
-                });
-                var fieldNameText = document.getElementById('info');
-                fieldNameText.textContent = "Select a buffer distance and click a location on the map to return the Points of Interest within that distance.";
-            }
-            //clear the query when user closes the expand widget
-            if (!queryExpand.expanded) {
-                mouseEvtHandler.remove();
-                mouseEvtHandler = null;
-                view.graphics.remove(pointGraphic);
-                    if (view.graphics.includes(bufferGraphic)) {
-                        view.graphics.remove(bufferGraphic);
-                    }
-                var fieldNameText = document.getElementById('info');
-                fieldNameText.textContent = "Select a tool on the right to use that specific function.";
-            }
-          }); 
-          
-        // *****************************************************
-        // Create the Filter widget with the associated actions
-        // and add it to the top-right corner of the view.
-        // *****************************************************
-          
-        const poisNodes = document.querySelectorAll(`.poi-item`);
-        const poisElement = document.getElementById("poi-filter");
-
-        // click event handler for pois choices
-        poisElement.addEventListener("click", filterBypoi);
-
-        // set an attribute filter on filter layer view
-        // to display the warnings issued in that poi
-        function filterBypoi(event) {
-          const selectedpoi = event.target.getAttribute("data-poi");
-          filterLayerView.filter = {
-            where: "POITYPE = '" + selectedpoi + "'"
-          };
-        }
-
-        view.whenLayerView(layerPOI).then((layerView) => {
+        //view.whenLayerView(layerMunis).then((layerView) => {
           // flash filter warnings layer loaded
           // get a reference to the filter warnings layerview
-          filterLayerView = layerView;
+          //layerMunisView = layerView;
 
           // set up UI items
-          poisElement.style.visibility = "visible";
+          //queryElement.style.visibility = "visible";
         
-          let poisExpand = new Expand({
+          let queryExpand = new Expand({
             view: view,
-            content: poisElement,
+            content: queryElement,
             mode: "floating",
             expandTooltip: "Expand Filter",
             expandIconClass: "esri-icon-filter",
@@ -2054,27 +2564,22 @@
           });
             
           //add instruction information when user expands the widget
-          poisExpand.watch("expanded", () => {
-            if (poisExpand.expanded) {
+          queryExpand.watch("expanded", () => {
+            if (queryExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Filter Point of Interest type by selecting from the list. Closing the Filter tool will reset to default.";
+              fieldNameText.textContent = "Filter view of data layers. To reset layers, click the Clear Filter button.";
             }
             //clear the filters when user closes the expand widget  
-            if (!poisExpand.expanded) {
-              filterLayerView.filter = null;
+            if (!queryExpand.expanded) {
+              //queryElement.style.visibility = "hidden";
               var fieldNameText = document.getElementById('info');
               fieldNameText.textContent = "Select a tool on the right to use that specific function.";
             }
           });
-          //view.ui.add(poisExpand, "top-right");
-          view.ui.add([infoToolbarExpand, editExpand, legendExpand, searchExpand, poisExpand, queryExpand, layerListExpand], "top-right");
+          //view.ui.add(queryExpand, "top-right");
+          view.ui.add([infoToolbarExpand, legendExpand, searchExpand, layerListExpand, queryExpand], "top-right");
             
-        });
-          
-        
-        
-        
-          
+        //});
           
         
       });
@@ -2089,36 +2594,59 @@
     </div>
     <div id="infoToolbar" class="esri-widget">
         <div class="image"></div>
-        <h3>Tree Locator Application</h3>
-        The Giant Sequoia is the most massive type of tree in the world. While it is well adapted to natural fire conditions, because of changing climate conditions and fire supression methods, the Sequoia are at much greater risk of destructive fires today, including those in the summer of 2021. As a result, the park has decided to task both its own staff and volunteers to inventory the Giant Sequoias within the known groves in the park.
+        <h3>Wisconsin Voting Districts</h3>
+        Every 10 years, as a result of the U.S. Census, Wisconsin has to complete the redistricting process. When ballots are created for each election, the races are determined by different districts.
         <br><br>
-        To use this application, click on the tools to the right of the map. The primary tool is an editor tool to add a new tree entry or edit existing information. There is also a filter for Points of Interest and a query tool to find Points of Interest near the user's location. Finally, there are tools for searching for locations, turning on/off data layers and for viewing a legend.
+        To get started, click on the specific district information that you want to see by clicking the Expand District List button. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click the checkbox. For those districts that are grayed out, zoom to appropriate level to be able to see them.
+        
+        
         <br>
-        <h6>Data and symbology courtesy National Park Service. Created by Greg Grube for Geography 777 at UW-Madison, Spring 2022.</h6>
+        <h6>Created by Greg Grube for Geography 778 at UW-Madison, Summer 2022.</h6>
 
     </div>
-    <div id="poi-filter" class="esri-widget">
-      <div class="poi-item visible-poi" data-poi="Restroom">Restroom</div>
-      <div class="poi-item visible-poi" data-poi="Ranger Station">Ranger Station</div>
-      <div class="poi-item visible-poi" data-poi="Trailhead">Trailhead</div>
-      <div class="poi-item visible-poi" data-poi="Campground">Campground</div>
-      <div class="poi-item visible-poi" data-poi="Telephone">Telephone</div>
-      <div class="poi-item visible-poi" data-poi="Picnic Area">Picnic Area</div>
-      <div class="poi-item visible-poi" data-poi="Store">Store</div>
-      <div class="poi-item visible-poi" data-poi="Lodge">Lodge</div>
-      <div class="poi-item visible-poi" data-poi="Entrance Station">Entrance Station</div>
-      <div class="poi-item visible-poi" data-poi="Visitor Center">Visitor Center</div>
+        
+<!--
+    <div id="queryDiv">
+        <div id="point-button" class="esri-widget esri-widget--button esri-interactive" title="Select Countries">
+          <span class="esri-icon-map-pin"></span>
+        </div>
     </div>
-    <div id="optionsDiv" class="esri-widget">
-      <select id="query-type" class="esri-widget">
-        <option value="distance">1/2 Mile</option>
-        <option value="OneMile">One Mile</option>
-        <option value="TwoMiles">Two Miles</option>
-        <option value="FiveMiles">Five Miles</option>
+-->
+    <div id="queryDiv" class="esri-widget">
+          <b>Filter by Municipality or County</b><br />
+            <br />
         
-      </select>
+          Select the jurisdiction type:<br />
+          <input id="layerMunisViewFilter" input name="layerSwitcher" type="radio" value="1" checked />
+          Municipality<br />
+          <input id="layerCountiesViewFilter" input name="layerSwitcher" type="radio" value="2" /> County<br />
         
-        
-    </div>
+          <br />Click arrow button below, then click municipality or county on the map to show districts only for that location.
+          <h1 style="font-size:10px">*Usable with Wards, District Combos, Aldermanic and County Supervisor*</h1>
+          
+          
+          <div class="geometry-options">
+            <button
+              class="esri-widget--button esri-icon-navigation geometry-button"
+              id="point-geometry-button"
+              value="point"
+              title="Select Municipality"
+            ></button>
+              
+          </div>
+          <br />
+          
+          
+          <label for="relationship-select">Select spatial relationship:</label>
+          <select id="relationship-select" class="options">
+            <option value="contains">contains</option>
+            <option value="intersects">intersects</option>
+            </select>
+        <br /><br />
+          
+          <button class="esri-button" id="clearFilter" type="button">
+            Clear filter
+          </button>
+        </div>
   </body>
 </html>
