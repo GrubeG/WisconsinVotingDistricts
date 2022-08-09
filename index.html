@@ -1304,6 +1304,627 @@
         // add Multi-Jurisdictional Judge Feature Layer
         // *****************************************************
         
+        const MJJRenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Multi-Jurisdictional Judge"
+          },
+          field: "MJJNAME",
+          uniqueValueInfos: [{
+            value: "CITY OF PORTAGE AND VILLAGE OF ENDEAVOR",
+            label: "CITY OF PORTAGE AND VILLAGE OF ENDEAVOR",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              width: "0px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF MAZOMANIE AND BLACK EARTH",
+            label: "VILLAGES OF MAZOMANIE AND BLACK EARTH",
+            symbol: {
+              type: "simple-fill",
+              color: "#b5d6f2",
+              style: "solid"
+            }
+          }, {
+            value: "MARQUETTE COMMUNITY",
+            label: "MARQUETTE COMMUNITY",
+            symbol: {
+              type: "simple-fill",
+              color: "#0095ba",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "GILLETT JOINT MUNICIPAL COURT",
+            label: "GILLETT JOINT MUNICIPAL COURT",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGE AND TOWN OF BLOOMFIELD",
+            label: "VILLAGE AND TOWN OF BLOOMFIELD",
+            symbol: {
+              type: "simple-fill",
+              color: "#cab2d6",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF KIEL AND TOWN OF SCHLESWIG",
+            label: "CITY OF KIEL AND TOWN OF SCHLESWIG",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffff99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY AND TOWN OF SEYMOUR",
+            label: "CITY AND TOWN OF SEYMOUR",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF STEVENS POINT AND VILLAGE OF PLOVER",
+            label: "CITY OF STEVENS POINT AND VILLAGE OF PLOVER",
+            symbol: {
+              type: "simple-fill",
+              color: "#33a02c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF BIG BEND AND WAUKESHA",
+            label: "VILLAGES OF BIG BEND AND WAUKESHA",
+            symbol: {
+              type: "simple-fill",
+              color: "#e31a1c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "RIVER VALLEY",
+            label: "RIVER VALLEY",
+            symbol: {
+              type: "simple-fill",
+              color: "#ff7f00",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NEAR NORTH",
+            label: "NEAR NORTH",
+            symbol: {
+              type: "simple-fill",
+              color: "#6a3d9a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF AMERY, VILLAGES OF CLAYTON AND CLEAR LAKE, AND TOWN OF CLEAR LAKE",
+            label: "CITY OF AMERY, VILLAGES OF CLAYTON AND CLEAR LAKE, AND TOWN OF CLEAR LAKE",
+            symbol: {
+              type: "simple-fill",
+              color: "#b15928",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF WAUTOMA AND VILLAGE OF REDGRANITE",
+            label: "CITY OF WAUTOMA AND VILLAGE OF REDGRANITE",
+            symbol: {
+              type: "simple-fill",
+              color: "#8dd3c7",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF FOX LAKE AND VILLAGES OF BROWNSVILLE AND LOMIRA",
+            label: "CITY OF FOX LAKE AND VILLAGES OF BROWNSVILLE AND LOMIRA",
+            symbol: {
+              type: "simple-fill",
+              color: "#7db3ab",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF OSCEOLA AND DRESSER",
+            label: "VILLAGES OF OSCEOLA AND DRESSER",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb8072",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF MARATHON CITY AND ROTHSCHILD",
+            label: "VILLAGES OF MARATHON CITY AND ROTHSCHILD",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdb462",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGE AND TOWN OF ALBANY",
+            label: "VILLAGE AND TOWN OF ALBANY",
+            symbol: {
+              type: "simple-fill",
+              color: "#bebada",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGE OF HOBART AND TOWN OF LAWRENCE",
+            label: "VILLAGE OF HOBART AND TOWN OF LAWRENCE",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffed6f",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF HORICON AND VILLAGES OF HUSTISFORD AND IRON RIDGE",
+            label: "CITY OF HORICON AND VILLAGES OF HUSTISFORD AND IRON RIDGE",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffdf3c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITIES OF BEAVER DAM, MAYVILLE & WAUPUN, TOWNS OF BEAVER DAM, ASHIPPUN, RUBICON & VILLAGE OF NEOSHO",
+            label: "CITIES OF BEAVER DAM, MAYVILLE & WAUPUN, TOWNS OF BEAVER DAM, ASHIPPUN, RUBICON & VILLAGE OF NEOSHO",
+            symbol: {
+              type: "simple-fill",
+              color: "#fccde5",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF BLACK CREEK, BEAR CREEK AND NICHOLS",
+            label: "VILLAGES OF BLACK CREEK, BEAR CREEK AND NICHOLS",
+            symbol: {
+              type: "simple-fill",
+              color: "#d92b30",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF BRILLION AND VILLAGE OF REEDSVILLE",
+            label: "CITY OF BRILLION AND VILLAGE OF REEDSVILLE",
+            symbol: {
+              type: "simple-fill",
+              color: "#0095ba",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "BROWN COUNTY",
+            label: "BROWN COUNTY",
+            symbol: {
+              type: "simple-fill",
+              color: "#3cccb4",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGE OF CAMERON AND TOWN OF STANLEY",
+            label: "VILLAGE OF CAMERON AND TOWN OF STANLEY",
+            symbol: {
+              type: "simple-fill",
+              color: "#ab52b3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "COULEE REGION",
+            label: "COULEE REGION",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffb259",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "TOWN OF DOVER AND VILLAGE OF YORKVILLE",
+            label: "TOWN OF DOVER AND VILLAGE OF YORKVILLE",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffdf3c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "EASTERN COLUMBIA COUNTY",
+            label: "EASTERN COLUMBIA COUNTY",
+            symbol: {
+              type: "simple-fill",
+              color: "#eb82eb",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "EASTERN DANE COUNTY",
+            label: "EASTERN DANE COUNTY",
+            symbol: {
+              type: "simple-fill",
+              color: "#c27c30",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF EDGERTON AND TOWNS OF ALBION AND FULTON",
+            label: "CITY OF EDGERTON AND TOWNS OF ALBION AND FULTON",
+            symbol: {
+              type: "simple-fill",
+              color: "#a0d17d",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NORTHERN MORAINE",
+            label: "NORTHERN MORAINE",
+            symbol: {
+              type: "simple-fill",
+              color: "#f260a1",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF EVANSVILLE AND TOWN OF UNION",
+            label: "CITY OF EVANSVILLE AND TOWN OF UNION",
+            symbol: {
+              type: "simple-fill",
+              color: "#7db3ab",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "TOWNS OF GRAND RAPIDS AND SARATOGA",
+            label: "TOWNS OF GRAND RAPIDS AND SARATOGA",
+            symbol: {
+              type: "simple-fill",
+              color: "#dbe6d1",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "HIDDEN VALLEYS",
+            label: "HIDDEN VALLEYS",
+            symbol: {
+              type: "simple-fill",
+              color: "#d6a394",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "KICKAPOO RIVER",
+            label: "KICKAPOO RIVER",
+            symbol: {
+              type: "simple-fill",
+              color: "#c8e0e3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "LAKE COUNTRY",
+            label: "LAKE COUNTRY",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY AND TOWN OF LAKE MILLS",
+            label: "CITY AND TOWN OF LAKE MILLS",
+            symbol: {
+              type: "simple-fill",
+              color: "#f2f1c2",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "LAKESIDE",
+            label: "LAKESIDE",
+            symbol: {
+              type: "simple-fill",
+              color: "#bf7872",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF MENASHA AND NEENAH",
+            label: "CITY OF MENASHA AND NEENAH",
+            symbol: {
+              type: "simple-fill",
+              color: "#e3a3dd",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MID-MORAINE",
+            label: "MID-MORAINE",
+            symbol: {
+              type: "simple-fill",
+              color: "#a6cee3",
+              width: "0px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGE OF MOUNT HOREB, TOWNS OF PERRY, PRIMROSE, SPRINGDALE AND VERMONT",
+            label: "VILLAGE OF MOUNT HOREB, TOWNS OF PERRY, PRIMROSE, SPRINGDALE AND VERMONT",
+            symbol: {
+              type: "simple-fill",
+              color: "#b2df8a",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF ELMWOOD PARK AND MOUNT PLEASANT",
+            label: "VILLAGES OF ELMWOOD PARK AND MOUNT PLEASANT",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF NORTH PRAIRIE AND EAGLE, TOWN OF MUKWONAGO",
+            label: "VILLAGES OF NORTH PRAIRIE AND EAGLE, TOWN OF MUKWONAGO",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdbf6f",
+              style: "solid"
+            }
+          }, {
+            value: "NORTHERN WAUPACA COUNTY",
+            label: "NORTHERN WAUPACA COUNTY",
+            symbol: {
+              type: "simple-fill",
+              color: "#cab2d6",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGE AND TOWN OF OREGON",
+            label: "VILLAGE AND TOWN OF OREGON",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffff99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF PESHTIGO AND TOWNS OF PESHTIGO, PORTERFIELD AND GROVER",
+            label: "CITY OF PESHTIGO AND TOWNS OF PESHTIGO, PORTERFIELD AND GROVER",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "MARSHFIELD AREA",
+            label: "MARSHFIELD AREA",
+            symbol: {
+              type: "simple-fill",
+              color: "#33a02c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF REEDSBURG AND TOWN OF LA VALLE",
+            label: "CITY OF REEDSBURG AND TOWN OF LA VALLE",
+            symbol: {
+              type: "simple-fill",
+              color: "#e31a1c",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "REGIONAL CENTER",
+            label: "REGIONAL CENTER",
+            symbol: {
+              type: "simple-fill",
+              color: "#ff7f00",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF SAUK PRAIRIE, PRAIRIE DU SAC AND TOWN OF ROXBURY",
+            label: "VILLAGES OF SAUK PRAIRIE, PRAIRIE DU SAC AND TOWN OF ROXBURY",
+            symbol: {
+              type: "simple-fill",
+              color: "#6a3d9a",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "EVEREST METRO",
+            label: "EVEREST METRO",
+            symbol: {
+              type: "simple-fill",
+              color: "#b15928",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF SHAWANO AND VILLAGE OF BONDUEL",
+            label: "CITY OF SHAWANO AND VILLAGE OF BONDUEL",
+            symbol: {
+              type: "simple-fill",
+              color: "#8dd3c7",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NORTHERN MARINETTE COUNTY",
+            label: "NORTHERN MARINETTE COUNTY",
+            symbol: {
+              type: "simple-fill",
+              color: "#80b1d3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF SHEBOYGAN AND VILLAGE OF KOHLER",
+            label: "CITY OF SHEBOYGAN AND VILLAGE OF KOHLER",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb8072",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF STOUGHTON AND TOWNS OF DUNKIRK, PLEASANT SPRINGS AND RUTLAND",
+            label: "CITY OF STOUGHTON AND TOWNS OF DUNKIRK, PLEASANT SPRINGS AND RUTLAND",
+            symbol: {
+              type: "simple-fill",
+              color: "#fdb462",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NORTHEAST WISCONSIN",
+            label: "NORTHEAST WISCONSIN",
+            symbol: {
+              type: "simple-fill",
+              color: "#bebada",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF TURTLE LAKE, ALMENA AND TOWN OF ALMENA",
+            label: "VILLAGES OF TURTLE LAKE, ALMENA AND TOWN OF ALMENA",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffed6f",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF TWO RIVERS AND VILLAGE OF MISHICOT",
+            label: "CITY OF TWO RIVERS AND VILLAGE OF MISHICOT",
+            symbol: {
+              type: "simple-fill",
+              color: "#b3de69",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF DEFOREST AND WINDSOR",
+            label: "VILLAGES OF DEFOREST AND WINDSOR",
+            symbol: {
+              type: "simple-fill",
+              color: "#fccde5",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGES OF NORTH BAY AND WIND POINT",
+            label: "VILLAGES OF NORTH BAY AND WIND POINT",
+            symbol: {
+              type: "simple-fill",
+              color: "#d92b30",
+              style: "solid"
+            }
+          }, {
+            value: "MAUSTON AREA",
+            label: "MAUSTON AREA",
+            symbol: {
+              type: "simple-fill",
+              color: "#fb9a99",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NORTH SHORE",
+            label: "NORTH SHORE",
+            symbol: {
+              type: "simple-fill",
+              color: "#3cccb4",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF MERRILL AND TOMAHAWK",
+            label: "CITY OF MERRILL AND TOMAHAWK",
+            symbol: {
+              type: "simple-fill",
+              color: "#ab52b3",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF NEW LONDON AND WEYAUWEGA",
+            label: "CITY OF NEW LONDON AND WEYAUWEGA",
+            symbol: {
+              type: "simple-fill",
+              color: "#ffb259",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "VILLAGE AND TOWN OF SOMERS",
+            label: "VILLAGE AND TOWN OF SOMERS",
+            symbol: {
+              type: "simple-fill",
+              color: "#b3de69",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "TOWNS OF MILTON, HARMONY AND LIMA",
+            label: "TOWNS OF MILTON, HARMONY AND LIMA",
+            symbol: {
+              type: "simple-fill",
+              color: "#eb82eb",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "CITY OF DE PERE AND TOWN OF LEDGEVIEW",
+            label: "CITY OF DE PERE AND TOWN OF LEDGEVIEW",
+            symbol: {
+              type: "simple-fill",
+              color: "#c27c30",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "TOWNS OF MADISON, VERONA AND MIDDLETON",
+            label: "TOWNS OF MADISON, VERONA AND MIDDLETON",
+            symbol: {
+              type: "simple-fill",
+              color: "#1f78b4",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "NORTHEAST COMMUNITY",
+            label: "NORTHEAST COMMUNITY",
+            symbol: {
+              type: "simple-fill",
+              color: "#f260a1",
+              width: "1px",
+              style: "solid"
+            }
+          }, {
+            value: "WINNECONNE",
+            label: "WINNECONNE",
+            symbol: {
+              type: "simple-fill",
+              color: "#80b1d3",
+              width: "1px",
+              style: "solid"
+            }
+          },]
+        };
         
         var layerMJJ = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_MultiJurisdictionalJudge/FeatureServer/0",
@@ -1319,23 +1940,13 @@
           },
           minScale: 600000,
           maxScale: 0,
-          renderer: {
-              type: "simple",  // autocasts as new SimpleRenderer()
-              symbol: {
-                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
-                color: "#D2B48C",
-                outline: {  // autocasts as new SimpleLineSymbol()
-                  width: 1.25,
-                  color: "brown"
-                }
-              }
-            },
+          renderer: MJJRenderer,
           labelingInfo: {
               // autocasts as new LabelClass()
               symbol: {
                 type: "text", // autocasts as new TextSymbol()
                 color: "black",
-                haloColor: "#D2B48C",
+                haloColor: "#f5deb3",
                 haloSize: 1,
                 font: {
                   // autocast as new Font()
@@ -1999,7 +2610,7 @@
           layerListExpand.watch("expanded", () => {
             if (layerListExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Click the layer name or checkbox to turn that layer on/off.";
+              fieldNameText.textContent = "Click the layer name or checkbox to turn that layer on/off. Click the label symbol or visibility slider to adjust those elements of a layer.";
             }
             //clear the filters when user closes the expand widget  
             if (!layerListExpand.expanded) {
@@ -2449,7 +3060,7 @@
           queryExpand.watch("expanded", () => {
             if (queryExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Filter view of data layers. To reset layers, click the Clear Filter button.";
+              fieldNameText.textContent = "Filter view of data layers by municipality or county. To reset layers to their default view, click the Clear Filter button.";
             }
             //clear the filters when user closes the expand widget  
             if (!queryExpand.expanded) {
@@ -2477,7 +3088,7 @@
     <div id="infoToolbar" class="esri-widget">
         <div class="image"></div>
         <h3>Wisconsin Voting Districts</h3>
-        Every 10 years, as a result of the U.S. Census, Wisconsin has to complete the redistricting process. When ballots are created for each election, the races are determined by different districts.
+        Every 10 years after the U.S. Census, Wisconsin completes the redistricting process. As a result, many statewide and local districts are changed to reflect population changes. This application shows those new districts, as well as the other parcel-based voting districts that do not change through redistricting.
         <br><br>
         To get started, click on the specific district information that you want to see by clicking the Expand District List button. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click the checkbox. For those districts that are grayed out, zoom to appropriate level to be able to see them.
         
