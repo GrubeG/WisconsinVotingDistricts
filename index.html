@@ -2249,17 +2249,6 @@
             };
         }  
           
-        //Define the schools display renderer
-        var muniRenderer = {
-        type: "unique-value",
-        field: "MuniType",
-        uniqueValueInfos: [
-          muniFillSymbol("Town", null, "#D3D3D3"),
-          muniFillSymbol("Village", null, "#D3D3D3"),
-          muniFillSymbol("City", null, "#D3D3D3")
-        ]
-      };
-          
         // add the park trails featurelayer
         var layerMunis = new FeatureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/2022_June_Municipality_CombinedCounty/FeatureServer/0",
@@ -2269,7 +2258,17 @@
           visible: true,
           minScale: 600000,
           maxScale: 0,
-          renderer: muniRenderer,
+          renderer: {
+              type: "simple",  // autocasts as new SimpleRenderer()
+              symbol: {
+                type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                color: null,
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  width: 2.0,
+                  color: "#D3D3D3"
+                }
+              }
+            },
           labelingInfo: {
               // autocasts as new LabelClass()
               symbol: {
@@ -3090,7 +3089,7 @@
         <h3>Wisconsin Voting Districts</h3>
         Every 10 years after the U.S. Census, Wisconsin completes the redistricting process. As a result, many statewide and local districts are changed to reflect population changes. This application shows those new districts, as well as the other parcel-based voting districts that do not change through redistricting.
         <br><br>
-        To get started, click on the specific district information that you want to see by clicking the Expand District List button. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click the checkbox. For those districts that are grayed out, zoom to appropriate level to be able to see them.
+        To get started, click on the specific district information that you want to see by clicking the Expand District List button. For local districts, search first for the county or municipality to zoom directly to that location. To view district, click the checkbox. For those districts that are grayed out, zoom to appropriate level to see them.
         
         
         <br>
