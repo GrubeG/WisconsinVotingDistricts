@@ -52,7 +52,7 @@
       }
         
       .esri-view-height-small .esri-expand .esri-widget--panel, .esri-view-height-small .esri-expand .esri-widget--panel-height-only, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel-height-only {
-          max-height: 650px;
+          max-height: 580px;
           min-height: 60%;
           max-width: 250px;
       }
@@ -2846,7 +2846,7 @@
           searchExpand.watch("expanded", () => {
             if (searchExpand.expanded) {
               var fieldNameText = document.getElementById('info');
-              fieldNameText.textContent = "Click down arrow to select item type. To search, begin to type the first few letters of the feature and select from the list.";
+              fieldNameText.textContent = "To search, begin to type the first few letters of the feature and select from the list of counties, cities, villages, towns or school districts";
             }
             //clear the filters when user closes the expand widget  
             if (!searchExpand.expanded) {
