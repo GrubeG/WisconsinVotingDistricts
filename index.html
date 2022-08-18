@@ -2432,21 +2432,12 @@
           });
           view.ui.add(homeButton, "top-left");
             
-          var locateBtn = new Locate({
-            view: view,
-            goToOverride: function(view, options) {
-                options.target.scale = 1500;
-                return view.goTo(options.target);
-          }
-          });
-            
-          // Add the locate widget to the top left corner of the view
-          view.ui.add(locateBtn, {
-            position: "top-left"
-          });
-            
-            
         }
+            
+        
+            
+            
+        
 
         // *****************************************************
         // Set up the Default MapView
@@ -2706,6 +2697,23 @@
           
         // Add widget to the top right corner of the view
         view.ui.add(basemapExpand, "top-left");
+          
+        // *****************************************************
+        // add Locate Button and expand widgets to UI
+        // *****************************************************
+            
+          var locateBtn = new Locate({
+            view: view,
+            goToOverride: function(view, options) {
+                options.target.scale = 1500;
+                return view.goTo(options.target);
+          }
+          });
+            
+          // Add the locate widget to the top left corner of the view
+          view.ui.add(locateBtn, {
+            position: "top-left"
+          });
         
         // *****************************************************
         // Create and intro message widget with the associated actions
