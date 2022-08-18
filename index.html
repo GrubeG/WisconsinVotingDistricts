@@ -45,6 +45,11 @@
       div.image::before {
         content:url("img/WEC_Logo.png");
       }
+        
+      .esri-layer-list {
+        padding: calc(var(--esri-widget-padding-v) * 0.5) calc(var(--esri-widget-padding-h) * 0.5);
+
+      }
       
      .esri-layer-list .esri-item-list__scroller {
         max-height: 100%;
@@ -63,7 +68,7 @@
     
       .esri-layer-list__item {
         background-color: $background-color;
-        border-bottom: 1px solid $border-color;
+        border-bottom: 0px solid $border-color;
         position: relative;
         overflow: hidden;
         list-style: none;
@@ -77,7 +82,7 @@
         display: flex;
         justify-content: flex-start;
         align-items: flex-start;
-        padding: 4px 4px 4px 4px;
+        padding: 3px 3px 3px 3px;
         transition: border-color 250ms ease-in-out;
       }
         
@@ -92,7 +97,7 @@
         background-color: white;
         padding: 14px;
         border-radius: 5px;
-        width: 270px;
+        width: 290px;
         margin: 5px;
         bottom: 15px;
         right: 10px;
